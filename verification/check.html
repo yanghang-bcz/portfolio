@@ -1,0 +1,274 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>YangHang interaction verification</title>
+<style>body{font:14px monospace;background:#f5f1e7;color:#302a21;margin:24px}iframe{position:absolute;left:0;top:250px;border:0;transform:scale(.45);transform-origin:top left}pre{white-space:pre-wrap}#result{max-width:1000px}</style>
+<h1>Interaction verification</h1><pre id="result">Running…</pre><iframe title="Prototype under test"></iframe>
+<script>
+(async()=>{
+ const frame=document.querySelector('iframe'),output=document.querySelector('#result'),results=[];
+ const wait=ms=>new Promise(r=>setTimeout(r,ms));
+ // 固定 sleep 会偶发抢跑（同样的代码三次里偶尔挂一条）。等条件成立，最多等 ms。
+ const until=async(fn,ms=2500)=>{const t=Date.now();while(Date.now()-t<ms){if(fn())return true;await wait(50);}return false;};
+ function check(name,ok,detail){results.push({name,pass:!!ok,...(detail?{detail}: {})});output.textContent=JSON.stringify(results,null,2);}
+ async function load(width,height){frame.style.width=width+'px';frame.style.height=height+'px';await new Promise(resolve=>{frame.onload=resolve;frame.src='../index.html?qa='+Date.now()});await frame.contentDocument.fonts.ready;await wait(300);}
+ const positions=d=>[...d.querySelectorAll('.satellite')].map(e=>e.style.cssText);
+ const rect=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}};
+ await load(1920,1080);
+ let d=frame.contentDocument,w=frame.contentWindow;
+ const eagerImgs=[...d.images].filter(i=>i.loading!=='lazy');
+ check('Every eagerly loaded image asset resolved',eagerImgs.length>=13&&eagerImgs.every(i=>i.complete&&i.naturalWidth>0),{count:eagerImgs.length,broken:eagerImgs.filter(i=>!i.complete||!i.naturalWidth).map(i=>i.getAttribute('src'))});
+ check('Special Elite loaded',d.fonts.check('16px "Special Elite"'));
+ let first=positions(d);await wait(220);check('All five satellites translate along orbit',positions(d).every((p,i)=>p!==first[i]));
+ const radio=d.querySelector('[data-satellite="music"]');
+ radio.dispatchEvent(new w.PointerEvent('pointerenter',{pointerType:'mouse'}));first=positions(d);await wait(180);check('Hover pauses the entire orbit',positions(d).every((p,i)=>p===first[i]));
+ radio.focus();radio.dispatchEvent(new w.PointerEvent('pointerleave',{pointerType:'mouse'}));first=positions(d);await wait(180);check('Focus keeps orbit paused after mouse leaves',positions(d).every((p,i)=>p===first[i]));
+ check('Keyboard focus reveals archive label',w.getComputedStyle(radio.querySelector('.archive-label')).display!=='none');
+ radio.blur();first=positions(d);await wait(180);check('Orbit resumes after focus and hover leave',positions(d).every((p,i)=>p!==first[i]));
+ check('No manual pause control remains in the DOM',!d.querySelector('.motion-toggle'));
+ first=positions(d);await wait(180);check('Orbit keeps running with no pause control',positions(d).some((p,i)=>p!==first[i]));
+ check('Astronaut drift is not paused',w.getComputedStyle(d.querySelector('.astronaut')).animationPlayState!=='paused');
+ const paperBefore=rect(d.querySelector('.paper')),navBefore=rect(d.querySelector('.quick-nav'));
+ const artwork=[...d.querySelectorAll('#home .asset')];const before=artwork.map(rect);
+ radio.click();await wait(240);
+ const shifts=artwork.map((e,i)=>rect(e).x-before[i].x);
+ check('Every home visual moves by the same horizontal amount',shifts.every(s=>Math.abs(s-shifts[0])<.6)&&shifts[0]<-1,{min:Math.min(...shifts),max:Math.max(...shifts),spread:+(Math.max(...shifts)-Math.min(...shifts)).toFixed(3)});
+ check('Paper and top navigation remain stationary',JSON.stringify(paperBefore)===JSON.stringify(rect(d.querySelector('.paper')))&&JSON.stringify(navBefore)===JSON.stringify(rect(d.querySelector('.quick-nav'))));
+ const homeX=rect(d.querySelector('#home')).x,musicX=rect(d.querySelector('#music')).x;
+ check('Incoming content and home slide together',Math.abs(musicX-homeX-1920)<2,{homeX,musicX});
+ await wait(450);
+ check('Satellite opens Music and moves focus',d.querySelector('.is-active').id==='music'&&d.activeElement.id==='music-title');
+ check('Only current page is keyboard accessible',[...d.querySelectorAll('.page')].every(p=>p.id==='music'?!p.inert:p.inert));
+ d.querySelector('#music .back-link').click();await wait(680);check('Return home works',d.querySelector('.is-active').id==='home');
+ for(const route of ['about','works','music','thoughts','travel']){
+   const link=d.querySelector('.quick-nav [data-route="'+route+'"]');
+   link.click();
+   const lit=[...d.querySelectorAll('.quick-nav a[aria-current="page"]')];
+   check('Underline moves on click, not after the slide: '+route,lit.length===1&&lit[0]===link);
+   await until(()=>d.querySelector('.is-active')?.id===route&&w.location.hash==='#'+route);
+   check('Top navigation opens '+route,d.querySelector('.is-active').id===route&&w.location.hash==='#'+route);
+   const pg=d.querySelector('#'+route),foot=pg.querySelector('.folio-footer'),col=pg.querySelector('.folio').getBoundingClientRect();
+   const parts=[...(foot?foot.querySelectorAll(':scope>span'):[])],ls=foot?parseFloat(w.getComputedStyle(foot).letterSpacing)||0:0;
+   const rs=parts.map(e=>e.getBoundingClientRect());
+   const footOk=rs.length===3&&(()=>{const[fl,fm,fr]=rs;
+     return Math.abs(fl.left-col.left)<0.6&&Math.abs(fl.bottom-fm.bottom)<0.6&&Math.abs(fm.bottom-fr.bottom)<0.6
+       &&Math.abs((fm.left+fm.right)/2-(col.left+col.right)/2)<0.6
+       &&fr.right>=col.right-0.6&&fr.right<=col.right+ls+0.6&&!pg.querySelector('.site-copyright');})();
+   check('Footer left / centre / right aligned: '+route,footOk,rs.length===3?(()=>{const[fl,fm,fr]=rs;return{left:+(fl.left-col.left).toFixed(2),centre:+((fm.left+fm.right)/2-(col.left+col.right)/2).toFixed(2),right:+(fr.right-col.right).toFixed(2),ls};})():{parts:rs.length});
+ }
+ const navOrder=[...d.querySelectorAll('.quick-nav a')].map(a=>a.dataset.route);
+ const folioOrder=[...d.querySelectorAll('.page.inner-page')].map(pg=>({id:pg.id,n:pg.querySelector('.archive-number').textContent.slice(0,2)})).sort((a,b)=>a.n-b.n).map(x=>x.id);
+ check('Section numbers follow the top navigation order',JSON.stringify(folioOrder)===JSON.stringify(navOrder),{navOrder,folioOrder});
+ const stickerOrder=[...d.querySelectorAll('.satellite')].map(el=>({id:el.dataset.satellite,n:el.querySelector('.archive-label span').textContent.slice(0,2)})).sort((a,b)=>a.n-b.n).map(x=>x.id);
+ check('Home stickers use the same numbering',JSON.stringify(stickerOrder)===JSON.stringify(navOrder),{stickerOrder,navOrder});
+ const slideLog=[],nativeAnimate=d.defaultView.Element.prototype.animate;
+ d.defaultView.Element.prototype.animate=function(frames,opts){if(frames&&frames[0]&&frames[0].transform)slideLog.push({id:this.id,from:frames[0].transform});return nativeAnimate.call(this,frames,opts);};
+ const fromOf=id=>(slideLog.find(r=>r.id===id)||{}).from;
+ const clickNav=async sel=>{slideLog.length=0;d.querySelector(sel).click();await wait(680);};
+ await clickNav('.quick-nav [data-route="works"]');
+ check('Backward jump enters from the left (travel → works)',fromOf('works')==='translateX(-100%)',{from:fromOf('works')});
+ await clickNav('.quick-nav [data-route="travel"]');
+ check('Forward jump enters from the right (works → travel)',fromOf('travel')==='translateX(100%)',{from:fromOf('travel')});
+ await clickNav('#travel .back-link');
+ check('Returning home enters from the left',fromOf('home')==='translateX(-100%)',{from:fromOf('home')});
+ await clickNav('.quick-nav [data-route="music"]');
+ check('Entering a section from home enters from the right',fromOf('music')==='translateX(100%)',{from:fromOf('music')});
+ const pressLink=d.querySelector('.quick-nav [data-route="thoughts"]');
+ pressLink.dispatchEvent(new w.PointerEvent('pointerdown',{bubbles:true,button:0}));
+ check('Underline follows the press, before release',pressLink.getAttribute('aria-current')==='page');
+ pressLink.dispatchEvent(new w.PointerEvent('pointercancel',{bubbles:true}));
+ check('Cancelled press puts the underline back',!pressLink.hasAttribute('aria-current')&&d.querySelector('.is-active').id==='music');
+ d.defaultView.Element.prototype.animate=nativeAnimate;
+ d.querySelector('.quick-nav [data-route="works"]').click();await wait(680);
+ const cards=[...d.querySelectorAll('#works .work-card')];
+ check('Works shows four cards',cards.length===4&&d.querySelectorAll('#works .card-link').length===4);
+// 页眉副标题是英文，必须用站点其他英文那套打字机体，而不是中文明朝体。
+const wSub=d.querySelector('#works .sub-en'),wSubCS=w.getComputedStyle(wSub),wEmoji=wSub&&wSub.querySelector('.sub-emoji');
+check('Works subtitle reads “From 💡 to Reality” in the typewriter face',
+  wSub&&wSub.textContent.trim()==='From 💡 to Reality'&&wSubCS.fontFamily.startsWith('"Special Elite"'),
+  {text:wSub&&wSub.textContent.trim(),font:wSubCS.fontFamily});
+check('The bulb is a real emoji, not a text glyph',!!wEmoji&&w.getComputedStyle(wEmoji).fontFamily.includes('Apple Color Emoji')&&w.getComputedStyle(wEmoji).fontSize!=='13px',{font:wEmoji&&w.getComputedStyle(wEmoji).fontFamily});
+const tSub=d.querySelector('#thoughts .sub-en'),vSub=d.querySelector('#travel .folio-heading>p:last-child');
+check('Thoughts subtitle reads “Keep thinking...” in the same typewriter face',
+  !!tSub&&tSub.textContent.trim()==='Keep thinking...'&&w.getComputedStyle(tSub).fontFamily.startsWith('"Special Elite"'),
+  {text:tSub&&tSub.textContent.trim(),font:tSub&&w.getComputedStyle(tSub).fontFamily});
+check('Travel subtitle is the new Chinese line, still in the mincho face',
+  !!vSub&&vSub.textContent.trim()==='去体验不同地域的人和风景'&&w.getComputedStyle(vSub).fontFamily.startsWith('"Huiwen Mincho"'),
+  {text:vSub&&vSub.textContent.trim(),font:vSub&&w.getComputedStyle(vSub).fontFamily});
+ check('Four cards link to live https URLs in a new tab',[...d.querySelectorAll('#works .card-link')].every(a=>a.href.startsWith('https:')&&a.target==='_blank'&&a.rel.includes('noopener'))&&!d.querySelector('#works').textContent.includes('City Side B'));
+ const colCount=w.getComputedStyle(d.querySelector('.work-list')).gridTemplateColumns.split(' ').length;
+ check('Works lays out as a 2×2 grid at 1920',colCount===2&&new Set(cards.map(c=>Math.round(rect(c).y))).size===2,{columns:colCount,rows:[...new Set(cards.map(c=>Math.round(rect(c).y)))]});
+ const cardHits=cards.map(c=>{const r=rect(c),hit=d.elementFromPoint(r.x+r.w/2,r.y+r.h*0.75);return hit?(hit.className||hit.tagName):'null';});
+ check('Each card is one click target',cardHits.every(h=>h==='card-link'),{hits:cardHits,active:d.querySelector('.is-active').id});
+ const fadePx=(w.getComputedStyle(d.querySelector('#works')).maskImage.match(/[\d.]+px/g)||[]).map(parseFloat);
+ const fadeEnd=Math.max(...fadePx),navBox=rect(d.querySelector('.quick-nav')),folioPad=parseFloat(w.getComputedStyle(d.querySelector('#works .folio')).paddingTop);
+ check('Scrolled content fades out above the quick navigation',fadeEnd>navBox.y+navBox.h&&folioPad>=fadeEnd,{fadeEnd,navBottom:navBox.y+navBox.h,folioPad});
+// —— Music：两栏之间那四张撕纸贴纸 ——
+d.querySelector('.quick-nav [data-route="music"]').click();await wait(800);
+const floaters=[...d.querySelectorAll('.music-floaters img')];
+await Promise.all(floaters.map(i=>i.complete?0:i.decode().catch(()=>{})));await wait(150);
+const floatBox=d.querySelector('.music-floaters'),floatCS=w.getComputedStyle(floatBox),fl=rect(floatBox);
+const favBox=rect(d.querySelector('.music-favorites')),repBox=rect(d.querySelector('.music-repeat'));
+const flBoxes=floaters.map(rect);
+check('Music keeps four torn-paper stickers in the gap between the two collections',
+  floaters.length===4&&floaters.every(i=>i.complete&&i.naturalWidth>0),floaters.map(i=>i.getAttribute('src')));
+check('Side-by-side columns → the stickers run top-to-bottom, clear of both',
+  floatCS.flexDirection==='column'&&flBoxes.every((b,i)=>i===0||b.y>flBoxes[i-1].y)&&favBox.x+favBox.w<fl.x&&fl.x+fl.w<repBox.x,
+  {dir:floatCS.flexDirection,ys:flBoxes.map(b=>Math.round(b.y)),gapLeft:Math.round(fl.x-(favBox.x+favBox.w)),gapRight:Math.round(repBox.x-(fl.x+fl.w))});
+const hts=floaters.map(i=>i.offsetHeight),noteH=hts.slice(0,3);
+check('The gramophone outscales the three notes, which stay uniform',
+  hts[3]>Math.max(...noteH)+8&&Math.max(...noteH)-Math.min(...noteH)<=2&&hts[3]/Math.max(...noteH)>1.25,
+  {heights:hts,ratio:+(hts[3]/Math.max(...noteH)).toFixed(2)});
+const tA=floaters.map(i=>w.getComputedStyle(i).transform);await wait(450);
+const tB=floaters.map(i=>w.getComputedStyle(i).transform);
+check('They drift like the astronaut, each on its own phase',tA.every((v,i)=>v!==tB[i])&&new Set(floaters.map(i=>w.getComputedStyle(i).animationDuration)).size>1,
+  {durations:[...new Set(floaters.map(i=>w.getComputedStyle(i).animationDuration))]});
+const minGap=await(async()=>{let m=Infinity;const t0=performance.now();
+  while(performance.now()-t0<1200){const bs=floaters.map(i=>i.getBoundingClientRect());
+    for(let i=1;i<bs.length;i++)m=Math.min(m,bs[i].top-bs[i-1].bottom);
+    await new Promise(r=>w.requestAnimationFrame(r));}
+  return m;})();
+check('The gap between them never closes, even mid-float',minGap>4,{minGap:+minGap.toFixed(1)});
+d.querySelector('.quick-nav [data-route="about"]').click();await wait(680);
+const tagItems=[...d.querySelectorAll('#about .tag-item')];
+await Promise.all(tagItems.map(it=>{const img=it.querySelector('img');return img.complete?0:img.decode().catch(()=>{})}));await wait(200);
+const expectedTags=['ENFJ 主人公','17375051324@163.com','github.com/yanghang-bcz','Shanghai'];
+check('About lists four field tags after the intro',tagItems.length===4&&d.querySelector('#about .field-tags')?.previousElementSibling?.tagName==='P');
+check('Tag labels are loaded transparent PNGs',tagItems.every(it=>{const img=it.querySelector('img');return img.complete&&img.naturalWidth>0&&img.src.endsWith('.png');}),tagItems.map(it=>it.querySelector('img').src.split('/').pop()));
+check('Each tag is followed by its value',JSON.stringify(tagItems.map(it=>it.querySelector('.tag-value').textContent))===JSON.stringify(expectedTags),tagItems.map(it=>it.querySelector('.tag-value').textContent));
+const tagCols=w.getComputedStyle(d.querySelector('#about .field-tags')).gridTemplateColumns.split(' ').length;
+check('Field tags form a 2×2 grid on desktop',tagCols===2&&new Set(tagItems.map(it=>Math.round(rect(it).y))).size===2,{columns:tagCols});
+check('Tag values never overflow their row',tagItems.every(it=>{const v=rect(it.querySelector('.tag-value')),r=rect(it);return v.x+v.w<=r.x+r.w+0.5;}),tagItems.map(it=>({v:rect(it.querySelector('.tag-value')),r:rect(it)})));
+// About 的两张照片：上面那张要压住下面那张的左上角，且整体落在正文右侧的空白里。
+const printBase=d.querySelector('#about .photo-print--base'),printTop=d.querySelector('#about .photo-print--top');
+const tilt=el=>{const m=new w.DOMMatrixReadOnly(w.getComputedStyle(el).transform);return Math.round(Math.atan2(m.b,m.a)*1800/Math.PI)/10;};
+const pb=rect(printBase),pt=rect(printTop),intro=rect(d.querySelector('.about-entry > p:not(.category)')),aboutFolio=rect(d.querySelector('#about .folio'));
+const ovl={w:Math.round(Math.min(pb.x+pb.w,pt.x+pt.w)-Math.max(pb.x,pt.x)),h:Math.round(Math.min(pb.y+pb.h,pt.y+pt.h)-Math.max(pb.y,pt.y))};
+check('About holds both photos as real loaded assets',[printBase,printTop].every(f=>{const i=f.querySelector('img');return i.complete&&i.naturalWidth>0&&/photo-(bamboo|selfie)\.jpg$/.test(i.getAttribute('src'));}),[printBase,printTop].map(f=>f.querySelector('img').getAttribute('src')));
+check('The selfie sits on top and bites into the bamboo shot’s top-left',Number(w.getComputedStyle(printTop).zIndex)>Number(w.getComputedStyle(printBase).zIndex)&&ovl.w>100&&ovl.h>120,{overlap:ovl,z:[w.getComputedStyle(printBase).zIndex,w.getComputedStyle(printTop).zIndex]});
+check('The two prints lean opposite ways, not onto a grid',tilt(printBase)<-1&&tilt(printTop)>1,{base:tilt(printBase),top:tilt(printTop)});
+check('On desktop the pair sits in the right margin, clear of the text',
+  pb.x>intro.x+intro.w+40&&pb.y>aboutFolio.y&&pb.y+pb.h<aboutFolio.y+aboutFolio.h,
+  {photoLeft:Math.round(pb.x),textRight:Math.round(intro.x+intro.w)});
+check('Neither print reaches into the copy column',[pb,pt].every(r=>r.x>=intro.x+intro.w),{photoLeft:Math.round(Math.min(pb.x,pt.x)),textRight:Math.round(intro.x+intro.w)});
+ d.querySelector('.quick-nav [data-route="works"]').click();await wait(100);d.querySelector('.quick-nav [data-route="about"]').click();await wait(100);w.history.back();await wait(1450);
+ check('Back during a transition preserves URL/page agreement',d.querySelector('.is-active').id===w.location.hash.slice(1),{page:d.querySelector('.is-active').id,hash:w.location.hash});
+ const routeBefore=d.querySelector('.is-active').id,hashBefore=w.location.hash;d.querySelector('.skip-link').click();await wait(50);
+ check('Skip link retains current route',routeBefore===d.querySelector('.is-active').id&&hashBefore===w.location.hash);
+ for(const [width,height] of [[1366,768],[390,844],[320,568],[667,375]]){
+   await load(width,height);d=frame.contentDocument;w=frame.contentWindow;
+   const targets=[...d.querySelectorAll('.satellite')].map(rect),links=[...d.querySelectorAll('.quick-nav a')].map(rect);
+   check(width+'×'+height+' touch targets ≥44px',targets.every(r=>r.w>=43.9&&r.h>=43.9),targets.map(r=>({w:r.w,h:r.h})));
+   check(width+'×'+height+' all satellite centers reachable',targets.every(r=>r.x+r.w/2>=0&&r.x+r.w/2<=width&&r.y+r.h/2>=55&&r.y+r.h/2<=height-45));
+   check(width+'×'+height+' top navigation fits',links.every(r=>r.x>=0&&r.x+r.w<=width&&r.y>=0&&r.y+r.h<=height));
+  check(width+'×'+height+' no horizontal document overflow',d.documentElement.scrollWidth===width);
+}
+await load(390,844);d=frame.contentDocument;w=frame.contentWindow;
+d.querySelector('.quick-nav [data-route="about"]').click();await wait(700);
+const mTags=[...d.querySelectorAll('#about .tag-item')];
+await Promise.all(mTags.map(it=>{const img=it.querySelector('img');return img.complete?0:img.decode().catch(()=>{})}));await wait(200);
+check('390px: field tags stack in one column without overflow',w.getComputedStyle(d.querySelector('#about .field-tags')).gridTemplateColumns.split(' ').length===1&&mTags.every(it=>{const v=rect(it.querySelector('.tag-value')),r=rect(it);return v.x+v.w<=r.x+r.w+0.5;})&&d.documentElement.scrollWidth===390,mTags.map(it=>({v:rect(it.querySelector('.tag-value')),r:rect(it)})));
+// 手机上没有右侧空白，照片回到正文流：标签之后、CTA 之前，两张仍然要叠着。
+const mPhotoBox=rect(d.querySelector('#about .about-photos')),mBase=rect(d.querySelector('#about .photo-print--base')),mTop=rect(d.querySelector('#about .photo-print--top'));
+const mTagsRect=rect(d.querySelector('#about .field-tags')),mCta=rect(d.querySelector('#about .in-content'));
+const mOvl=Math.round(Math.min(mBase.x+mBase.w,mTop.x+mTop.w)-Math.max(mBase.x,mTop.x));
+// 旋转后的包围盒会比容器宽几像素，用 offsetLeft/offsetWidth（未旋转的布局值）判断是否真的在容器里。
+const mBoxEl=d.querySelector('#about .about-photos'),mBoxW=mBoxEl.offsetWidth;
+const mFits=[d.querySelector('#about .photo-print--base'),d.querySelector('#about .photo-print--top')]
+  .map(el=>({left:el.offsetLeft,right:el.offsetLeft+el.offsetWidth,w:mBoxW}))
+  .every(o=>o.left>=-0.5&&o.right<=o.w+0.5);
+check('390px: both photos load and stack in the text flow',
+  w.getComputedStyle(mBoxEl).position==='relative'&&mPhotoBox.y>mTagsRect.y+mTagsRect.h&&mPhotoBox.y+mPhotoBox.h<=mCta.y+1&&mFits
+  &&[...mBoxEl.querySelectorAll('img')].every(i=>i.complete&&i.naturalWidth>0),
+  {box:mPhotoBox,tags:mTagsRect,cta:mCta});
+check('390px: the overlap survives the reflow',mOvl>90&&mTop.y<mBase.y+40,{overlap:mOvl,gap:Math.round(mTop.y-mBase.y)});
+const mFoot=d.querySelector('#about .folio-footer'),mCol=rect(d.querySelector('#about .folio'));
+const mParts=[...mFoot.querySelectorAll(':scope>span')].map(rect);
+check('390px: footer wraps to two rows with the copyright centred below',
+  mParts.length===3&&Math.abs(mParts[0].x-mCol.x)<0.6&&Math.abs(mParts[0].y-mParts[2].y)<0.6&&mParts[1].y>mParts[0].y+6
+  &&Math.abs(mParts[1].x+mParts[1].w/2-(mCol.x+mCol.w/2))<0.6&&d.documentElement.scrollWidth===390,
+  {parts:mParts.map(r=>({x:+r.x.toFixed(1),y:+r.y.toFixed(1),w:+r.w.toFixed(1)})),col:{x:mCol.x,w:mCol.w}});
+// 竖排布局下四张贴纸改成从左到右，夹在 Favo 12 与 Lately 之间。
+d.querySelector('.quick-nav [data-route="music"]').click();await wait(750);
+const rFloaters=[...d.querySelectorAll('.music-floaters img')],rBox=d.querySelector('.music-floaters');
+const rFav=rect(d.querySelector('.music-favorites')),rRep=rect(d.querySelector('.music-repeat'));
+const rFlBox=rect(rBox),rImgs=rFloaters.map(rect);
+check('390px: the stickers turn into a left-to-right row between the two stacked collections',
+  w.getComputedStyle(rBox).flexDirection==='row'&&rImgs.every((b,i)=>i===0||b.x>rImgs[i-1].x)
+  &&rFlBox.y>rFav.y+rFav.h&&rFlBox.y+rFlBox.h<rRep.y&&w.getComputedStyle(rBox).gap!=='0px',
+  {dir:w.getComputedStyle(rBox).flexDirection,xs:rImgs.map(b=>Math.round(b.x)),gap:w.getComputedStyle(rBox).gap});
+ // —— Thoughts 001 · 母职：卡片、弹层、两篇文章 ——
+await load(1920,1080);d=frame.contentDocument;w=frame.contentWindow;
+d.querySelector('.quick-nav [data-route="thoughts"]').click();await wait(800);
+const thCard=d.querySelector('.thought-card'),thCS=w.getComputedStyle(thCard),thR=rect(thCard);
+// Thoughts 以前少了页眉下面那条分隔线，是五个页面里唯一"悬空"的。这里量它与 About / Works 是否同一条线、同一个位置。
+const thList=d.querySelector('#thoughts .thought-list'),thListCS=w.getComputedStyle(thList);
+const gapUnder=page=>{const sub=page.querySelector('.folio-heading>p:last-child').getBoundingClientRect();
+  const block=page.querySelector('.thought-list,.work-list,.empty-entry,.music-spread').getBoundingClientRect();
+  return +(block.top-sub.bottom).toFixed(1);};
+check('Thoughts has the same hairline under the heading as the other pages',
+  thListCS.borderTopStyle==='solid'&&parseFloat(thListCS.borderTopWidth)===1&&thListCS.borderTopColor==='rgba(118, 103, 78, 0.376)'&&thListCS.paddingTop==='24px',
+  {width:thListCS.borderTopWidth,color:thListCS.borderTopColor,pad:thListCS.paddingTop});
+check('That hairline sits at the same distance below the subtitle as About and Works',
+  gapUnder(d.querySelector('#thoughts'))===gapUnder(d.querySelector('#about'))&&gapUnder(d.querySelector('#thoughts'))===gapUnder(d.querySelector('#works')),
+  {thoughts:gapUnder(d.querySelector('#thoughts')),about:gapUnder(d.querySelector('#about')),works:gapUnder(d.querySelector('#works'))});
+check('Thoughts shows one archive card at 400–440px',d.querySelectorAll('#thoughts .thought-card').length===1&&thR.w>=400&&thR.w<=440&&thCS.padding==='26px'&&thCS.borderRadius==='3px'&&thCS.backgroundColor==='rgb(243, 237, 227)',{w:thR.w,pad:thCS.padding,bg:thCS.backgroundColor});
+const tagPairs=[...d.querySelectorAll('.thought-card .thought-tags li')].map(li=>[li.textContent,w.getComputedStyle(li).backgroundColor,w.getComputedStyle(li).color]);
+check('Card wears the four archive tags with their own colours',JSON.stringify(tagPairs)===JSON.stringify([['母职','rgb(235, 211, 197)','rgb(128, 78, 64)'],['女性处境','rgb(229, 214, 189)','rgb(119, 94, 62)'],['精神健康','rgb(220, 227, 213)','rgb(81, 102, 77)'],['音乐与社会','rgb(218, 223, 235)','rgb(82, 100, 129)']]),tagPairs);
+thCard.querySelector('.thought-open').click();await wait(420);
+const readerEl=d.querySelector('#reader-001'),sc=readerEl.querySelector('.reader-scroll');
+check('Card opens a dialog over the page, not a new page',!readerEl.hidden&&readerEl.classList.contains('is-open')&&readerEl.getAttribute('aria-modal')==='true'&&w.location.hash==='#thoughts');
+check('Background page stops scrolling while reading',w.getComputedStyle(d.querySelector('#thoughts')).overflow==='hidden');
+check('The page behind the reader is inert while reading',d.querySelector('.pages').inert===true);
+check('Focus moves into the dialog',readerEl.contains(d.activeElement));
+check('Reader opens at the top of the article',sc.scrollTop===0&&readerEl.querySelector('.reader-title').textContent==='母职');
+const n1=readerEl.querySelector('[data-goto="part-1"]'),n2=readerEl.querySelector('[data-goto="part-2"]');
+check('Part 1 / Part 2 quick nav use their own colours',
+  w.getComputedStyle(n1).backgroundColor==='rgb(235, 211, 197)'&&w.getComputedStyle(n1).borderLeftColor==='rgb(153, 93, 77)'
+  &&w.getComputedStyle(n2).backgroundColor==='rgb(213, 227, 224)'&&w.getComputedStyle(n2).borderLeftColor==='rgb(78, 118, 109)');
+const scrollTo2=async()=>{n2.click();await wait(900);return Math.round(readerEl.querySelector('#part-2').getBoundingClientRect().top-sc.getBoundingClientRect().top);};
+const p2Offset=await scrollTo2();
+check('Part 2 quick nav scrolls inside the reader only',sc.scrollTop>400&&p2Offset>-5&&p2Offset<70,{scrollTop:Math.round(sc.scrollTop),offset:p2Offset});
+check('Reader stays open after jumping',readerEl.classList.contains('is-open')&&readerEl.hidden!==true);
+n1.click();await wait(900);
+const p1Offset=Math.round(readerEl.querySelector('#part-1').getBoundingClientRect().top-sc.getBoundingClientRect().top);
+check('Part 1 quick nav scrolls back to Part 1',p1Offset>-5&&p1Offset<70,{offset:p1Offset});
+const bodies=[...readerEl.querySelectorAll('.article-body')];
+const charCount=b=>[...b.querySelectorAll('p')].reduce((n,p)=>n+p.textContent.length,0);
+check('Both parts sit continuously in one panel',bodies.length===2&&bodies[0].querySelectorAll('p').length===20&&bodies[1].querySelectorAll('p').length===16&&!readerEl.querySelector('[role="tablist"]'));
+check('Part 1 is the Lindsay案.docx text, character for character',charCount(bodies[0])===2118&&bodies[0].querySelector('p').textContent==='事件梗概：',{chars:charCount(bodies[0])});
+check('Part 2 is the 椎名林檎.docx text, character for character',charCount(bodies[1])===1283&&bodies[1].lastElementChild.textContent==='我希望所有女性生来都是一张可以自己自由涂画的白纸，而不是需要你逐一作答每道题目的试卷。',{chars:charCount(bodies[1])});
+check('Body type is 16.5px on a 720px measure',w.getComputedStyle(bodies[0].querySelector('p')).fontSize==='16.5px'&&Math.round(rect(bodies[0]).w)===720);
+d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await wait(360);
+check('Escape closes the reader and keeps the section',readerEl.hidden===true&&d.querySelector('.is-active').id==='thoughts');
+check('Closing returns focus to the card and unlocks the page',d.activeElement.classList.contains('thought-open')&&w.getComputedStyle(d.querySelector('#thoughts')).overflow!=='hidden');
+check('The page is interactive again after closing',d.querySelector('.pages').inert===false);
+d.querySelector('.thought-open').click();await wait(380);
+readerEl.querySelector('.reader-backdrop').click();await wait(360);
+check('Clicking the backdrop closes the reader',readerEl.hidden===true);
+d.querySelector('.thought-open').click();await wait(380);
+readerEl.querySelector('.article-body p').click();await wait(200);
+check('Clicking the article body does not close it',readerEl.classList.contains('is-open'));
+readerEl.querySelector('.reader-close').click();await wait(360);
+check('The close button closes the reader',readerEl.hidden===true);
+await load(390,844);d=frame.contentDocument;w=frame.contentWindow;
+d.querySelector('.quick-nav [data-route="thoughts"]').click();await wait(800);
+const mCard=rect(d.querySelector('.thought-card'));
+d.querySelector('.thought-open').click();
+// 入场是 translateY(10px)→0 的 200ms 过渡，固定等 420ms 偶尔会在 8.9px 处抢跑量到（Math.round 成 9）。
+// 等过渡真正归零再量。
+await until(()=>{const p=d.querySelector('.reader-panel');const m=new w.DOMMatrixReadOnly(w.getComputedStyle(p).transform);
+  return Math.abs(m.f)<0.4&&parseFloat(w.getComputedStyle(p).opacity)>0.99;});
+const mPanel=rect(d.querySelector('.reader-panel')),mSc=d.querySelector('.reader-scroll');
+check('390px: the card fills the column',Math.round(mCard.w)===346,{w:mCard.w});
+check('390px: the reader sits in the viewport with 8px margins',Math.round(mPanel.w)===374&&Math.round(mPanel.x)===8&&Math.round(mPanel.y)===8&&mPanel.h<=828,{panel:mPanel});
+check('390px: quick nav stacks, nothing overflows sideways',w.getComputedStyle(d.querySelector('.reader-nav')).gridTemplateColumns.split(' ').length===1&&d.documentElement.scrollWidth===390&&mSc.scrollWidth<=mSc.clientWidth+1);
+d.querySelector('.reader-close').click();await wait(300);
+// 1024 落在「放不进右侧空白」的区间：照片要退回正文流，并且贴着标签左边排，不是被推到右边。
+await load(1024,768);d=frame.contentDocument;w=frame.contentWindow;
+d.querySelector('.quick-nav [data-route="about"]').click();await wait(750);
+const nBox=rect(d.querySelector('#about .about-photos')),nTags=rect(d.querySelector('#about .field-tags'));
+check('1024px: the pair drops into the flow right under the tags, flush left',
+  Math.round(nBox.x)===Math.round(nTags.x)&&nBox.y>nTags.y+nTags.h&&nBox.y-(nTags.y+nTags.h)<40&&d.documentElement.scrollWidth===1024,
+  {box:nBox,tags:nTags});
+document.body.dataset.done='true';document.body.dataset.passed=results.every(r=>r.pass)?'true':'false';
+ output.textContent=JSON.stringify({passed:results.filter(r=>r.pass).length,total:results.length,results},null,2);
+})().catch(error=>{document.querySelector('#result').textContent=error.stack;document.body.dataset.done='true';document.body.dataset.passed='false'});
+</script></html>

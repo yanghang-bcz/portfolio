@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eee5d2">
+  <meta name="description" content="YangHang 的个人档案：作品、音乐、想法与旅行。">
+  <title>YangHang — My Little Universe</title>
+  <link rel="preload" href="assets/SpecialElite-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/HuiwenMincho-Regular-subset.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+  <script src="music.js" defer></script>
+  <script src="reader.js" defer></script>
+</head>
+<body>
+  <div class="paper" aria-hidden="true"></div>
+  <a class="skip-link" href="#page-content">跳到主要内容</a>
+  <nav class="quick-nav" aria-label="栏目快捷导航">
+    <a href="#about" data-route="about">ABOUT ME</a>
+    <a href="#works" data-route="works">WORKS</a>
+    <a href="#music" data-route="music">MUSIC</a>
+    <a href="#thoughts" data-route="thoughts">THOUGHTS</a>
+    <a href="#travel" data-route="travel">TRAVEL</a>
+  </nav>
+  <!-- 栏目编号 01—05 一律按顶部导航从左到右的顺序：about 01 / works 02 / music 03 / thoughts 04 / travel 05。
+       首页贴纸的档案纸签与各栏目页眉的 “NN / PERSONAL ARCHIVE” 必须同时改，别只改一处。 -->
+  <main id="page-content" class="pages" tabindex="-1">
+    <section class="page home-page is-active" id="home" aria-label="YangHang 的小小宇宙">
+      <h1 class="sr-only" tabindex="-1">YangHang — Welcome to my little universe</h1>
+      <div class="artboard">
+        <div class="scene" aria-label="复古航天档案拼贴">
+          <div class="engineering asset" data-node="7:11"><img src="assets/engineering.png" alt="" draggable="false"></div>
+          <div class="photo-back asset" data-node="6:9"><img src="assets/photo-back.png" alt="" draggable="false"></div>
+          <img class="photo-front asset" data-node="7:13" src="assets/photo-front.png" alt="" draggable="false">
+          <div class="orbit-half orbit-rear" aria-hidden="true">
+            <div class="arc-a"><img class="orbit-a asset" data-node="7:12" src="assets/orbit-a.png" alt="" draggable="false"></div>
+            <div class="arc-b"><div class="orbit-b asset" data-node="11:19"><img src="assets/orbit-b.png" alt="" draggable="false"></div></div>
+          </div>
+          <img class="astronaut asset" data-node="6:4" src="assets/astronaut.png" alt="黑白撕纸宇航员" draggable="false">
+          <div class="orbit-half orbit-front" aria-hidden="true">
+            <div class="arc-a"><img class="orbit-a asset" src="assets/orbit-a.png" alt="" draggable="false"></div>
+            <div class="arc-b"><div class="orbit-b asset"><img src="assets/orbit-b.png" alt="" draggable="false"></div></div>
+          </div>
+          <div class="satellites">
+            <a class="satellite satellite-works" href="#works" data-route="works" data-satellite="works" aria-label="Selected Works / 作品集">
+              <span class="sticker"><img data-node="9:15" src="assets/mac.png" alt="复古 Mac 电脑贴纸" draggable="false"></span>
+              <span class="archive-label"><span>02 / SELECTED WORKS</span><small>作品集</small></span>
+            </a>
+            <a class="satellite satellite-music" href="#music" data-route="music" data-satellite="music" aria-label="Music Archive / 音乐档案">
+              <span class="sticker"><img data-node="9:16" src="assets/radio.png" alt="复古收音机贴纸" draggable="false"></span>
+              <span class="archive-label"><span>03 / MUSIC ARCHIVE</span><small>音乐档案</small></span>
+            </a>
+            <a class="satellite satellite-about" href="#about" data-route="about" data-satellite="about" aria-label="About Me / 关于我">
+              <span class="sticker"><img data-node="9:18" src="assets/id.png" alt="旧证件卡贴纸" draggable="false"></span>
+              <span class="archive-label"><span>01 / ABOUT ME</span><small>关于我</small></span>
+            </a>
+            <a class="satellite satellite-thoughts" href="#thoughts" data-route="thoughts" data-satellite="thoughts" aria-label="Thoughts / 思考手记">
+              <span class="sticker"><img data-node="9:17" src="assets/bulb.png" alt="灯泡贴纸" draggable="false"></span>
+              <span class="archive-label"><span>04 / THOUGHTS</span><small>思考手记</small></span>
+            </a>
+            <a class="satellite satellite-travel" href="#travel" data-route="travel" data-satellite="travel" aria-label="Travel Log / 旅行日志">
+              <span class="sticker plane-sticker"><img data-node="7:14" src="assets/plane.png" alt="飞机贴纸" draggable="false"></span>
+              <span class="archive-label"><span>05 / TRAVEL LOG</span><small>旅行日志</small></span>
+            </a>
+          </div>
+        </div>
+        <img class="welcome asset" data-node="14:20" src="assets/welcome.png" alt="Welcome to my little universe" draggable="false">
+        <img class="wordmark asset" data-node="15:21" src="assets/logo.png" alt="YangHang" draggable="false">
+      </div>
+      <p class="site-copyright">© 2026 YangHang / Bryce</p>
+    </section>
+
+    <section class="page inner-page" id="works" aria-labelledby="works-title" aria-hidden="true" inert>
+      <div class="folio works-folio">
+        <a href="#home" data-route="home" class="back-link">← BACK HOME <span>返回首页</span></a>
+        <header class="folio-heading"><p class="archive-number">02 / PERSONAL ARCHIVE</p><h1 id="works-title" tabindex="-1">Selected Works</h1><p class="sub-en">From <span class="sub-emoji">💡</span> to Reality</p></header>
+        <div class="work-list">
+          <article class="work-card">
+            <div class="card-top"><span class="work-index">01</span><span class="category">AI &amp; REASONING</span></div>
+            <h2><a class="card-link" href="https://truth-detective-07655.app.workbuddy.host/" target="_blank" rel="noopener noreferrer"><span class="work-title work-title--truth">Truth Detective</span><span class="work-emoji" aria-hidden="true">🔍</span><span class="sr-only">（在新窗口打开）</span></a></h2>
+            <p class="card-desc">围绕证据与信息判断展开的 AI 辅助推理游戏。</p>
+            <span class="card-cta" aria-hidden="true">TRY IT ↗</span>
+          </article>
+          <article class="work-card">
+            <div class="card-top"><span class="work-index">02</span><span class="category">MATHEMATICS &amp; LEARNING</span></div>
+            <h2><a class="card-link" href="https://calcdaily.cn/" target="_blank" rel="noopener noreferrer"><span class="work-title work-title--calcdaily">CalcDaily</span><span class="work-emoji" aria-hidden="true">📝</span><span class="sr-only">（在新窗口打开）</span></a></h2>
+            <p class="card-desc">面向考研高等数学的练习工具，支持知识点练习与错题复习。</p>
+            <span class="card-cta" aria-hidden="true">TRY IT ↗</span>
+          </article>
+          <article class="work-card">
+            <div class="card-top"><span class="work-index">03</span><span class="category">STUDENT VOICES</span></div>
+            <h2><a class="card-link" href="https://campus-pulse.app.workbuddy.host/" target="_blank" rel="noopener noreferrer"><span class="work-title work-title--campus">Campus Pulse</span><span class="work-emoji" aria-hidden="true">📮</span><span class="sr-only">（在新窗口打开）</span></a></h2>
+            <p class="card-desc">整理与聚合校园反馈的研究原型。公开演示使用模拟数据。</p>
+            <span class="card-cta" aria-hidden="true">TRY IT ↗</span>
+          </article>
+          <article class="work-card">
+            <div class="card-top"><span class="work-index">04</span><span class="category">FINANCIAL MODELLING</span></div>
+            <h2><a class="card-link" href="https://finmodel-lab.app.workbuddy.host/?sharecode=PLWKCGJYNW" target="_blank" rel="noopener noreferrer"><span class="work-title work-title--finmodel">FinModel Lab</span><span class="work-emoji" aria-hidden="true">📈</span><span class="sr-only">（在新窗口打开）</span></a></h2>
+            <p class="card-desc">通过交互图表、参数调整与 R 代码学习金融建模。</p>
+            <span class="card-cta" aria-hidden="true">TRY IT ↗</span>
+          </article>
+        </div>
+        <footer class="folio-footer"><span>YANGHANG / SELECTED WORKS</span><span class="footer-copy">© 2026 YangHang / Bryce</span><span>01—04</span></footer>
+      </div>
+    </section>
+
+    <section class="page inner-page" id="music" aria-labelledby="music-title" aria-hidden="true" inert>
+      <div class="folio music-folio">
+        <a href="#home" data-route="home" class="back-link">← BACK HOME <span>返回首页</span></a>
+        <header class="folio-heading"><p class="archive-number">03 / PERSONAL ARCHIVE</p><h1 id="music-title" tabindex="-1">Music Archive</h1><p>Into Pop、Rock、Electronic、Hiphop、Jazz...</p></header>
+        <div class="music-spread">
+          <section class="music-collection music-favorites" aria-labelledby="favorites-title">
+            <header class="collection-heading"><h2 id="favorites-title">Favo 12</h2><p>Twelve albums I keep coming back to.</p></header>
+            <ul class="album-grid favorites-grid" id="favorite-albums" aria-label="Favo 12 专辑封面占位，编号不代表排名"></ul>
+          </section>
+          <div class="music-floaters" aria-hidden="true">
+            <img src="assets/music-note-a.png" alt="" width="165" height="260" loading="lazy" decoding="async">
+            <img src="assets/music-note-b.png" alt="" width="180" height="260" loading="lazy" decoding="async">
+            <img src="assets/music-note-pair.png" alt="" width="243" height="260" loading="lazy" decoding="async">
+            <img src="assets/music-gramophone.png" alt="" width="218" height="260" loading="lazy" decoding="async">
+          </div>
+          <section class="music-collection music-repeat" aria-labelledby="repeat-title">
+            <header class="collection-heading"><h2 id="repeat-title">Lately, on repeat.</h2><p>What I've been listening to lately.</p></header>
+            <ul class="album-grid repeat-grid" id="repeat-albums" aria-label="近期循环收听的四张专辑"></ul>
+            <p class="music-updated">LAST UPDATED <span>2026.10.23</span></p>
+          </section>
+        </div>
+        <footer class="folio-footer"><span>YANGHANG / MUSIC ARCHIVE</span><span class="footer-copy">© 2026 YangHang / Bryce</span><span>PERSONAL SELECTION</span></footer>
+      </div>
+    </section>
+
+    <section class="page inner-page" id="about" aria-labelledby="about-title" aria-hidden="true" inert>
+      <div class="folio">
+        <a href="#home" data-route="home" class="back-link">← BACK HOME <span>返回首页</span></a>
+        <header class="folio-heading"><p class="archive-number">01 / PERSONAL ARCHIVE</p><h1 id="about-title" tabindex="-1">About Me</h1><p>杨航 / YangHang</p></header>
+        <div class="empty-entry about-entry"><p class="category">A NOTE FROM SHANGHAI</p><h2>你好，我是杨航。</h2><p>欢迎你来了解关于我。平时特别喜欢听音乐和研究音乐，如果你想了解我的音乐偏好和理解，可以点进 <a href="#music" data-route="music" class="inline-link">Music 专栏</a>。</p><p>同时也很喜欢看书，正不断拓宽自己的阅读面；喜欢讨论社会学问题，会思考关于性别与身体、人际间关系、权力与制度、技术与人等话题。</p><p>我也会在平时做一做自己的小工具和小网站，通过作品与世界和人建立更深的联系，去影响他人和社会。</p><div class="field-tags"><p class="tag-item"><img class="tag-label" src="assets/label-mbti.png" alt="MBTI" width="320" height="146" loading="lazy" decoding="async"><span class="tag-value">ENFJ 主人公</span></p><p class="tag-item"><img class="tag-label" src="assets/label-email.png" alt="EMAIL" width="320" height="173" loading="lazy" decoding="async"><span class="tag-value">17375051324@163.com</span></p><p class="tag-item"><img class="tag-label" src="assets/label-github.png" alt="GITHUB" width="320" height="157" loading="lazy" decoding="async"><span class="tag-value">github.com/yanghang-bcz</span></p><p class="tag-item"><img class="tag-label" src="assets/label-base.png" alt="BASE" width="320" height="155" loading="lazy" decoding="async"><span class="tag-value">Shanghai</span></p></div><div class="about-photos"><figure class="photo-print photo-print--base"><img src="assets/photo-bamboo.jpg" alt="杨航在雨后的竹林小径上撑着透明伞站着" width="640" height="854" loading="lazy" decoding="async"></figure><figure class="photo-print photo-print--top"><img src="assets/photo-selfie.jpg" alt="杨航在绿植前的自拍，背后草地上站着一只白鹅" width="480" height="640" loading="lazy" decoding="async"></figure></div><a href="#works" data-route="works" class="text-link in-content">EXPLORE MY WORKS ↗ <span>看看作品</span></a></div>
+        <footer class="folio-footer"><span>YANGHANG / ABOUT ME</span><span class="footer-copy">© 2026 YangHang / Bryce</span><span>SHANGHAI, CHINA</span></footer>
+      </div>
+    </section>
+
+    <section class="page inner-page" id="thoughts" aria-labelledby="thoughts-title" aria-hidden="true" inert>
+      <div class="folio">
+        <a href="#home" data-route="home" class="back-link">← BACK HOME <span>返回首页</span></a>
+        <header class="folio-heading"><p class="archive-number">04 / PERSONAL ARCHIVE</p><h1 id="thoughts-title" tabindex="-1">Thoughts</h1><p class="sub-en">Keep thinking...</p></header>
+        <div class="thought-list">
+          <article class="thought-card">
+            <p class="thought-index">THOUGHTS / 001</p>
+            <h2 class="thought-title"><button type="button" class="thought-open" data-reader-open="reader-001" aria-haspopup="dialog">母职</button></h2>
+            <ul class="thought-tags"><li>母职</li><li>女性处境</li><li>精神健康</li><li>音乐与社会</li></ul>
+            <div class="thought-foot"><span class="thought-source">PERSONAL THOUGHT / 001</span><span class="thought-arrow" aria-hidden="true">↗</span></div>
+          </article>
+        </div>
+        <footer class="folio-footer"><span>YANGHANG / THOUGHTS</span><span class="footer-copy">© 2026 YangHang / Bryce</span><span>01 NOTE</span></footer>
+      </div>
+    </section>
+
+    <section class="page inner-page" id="travel" aria-labelledby="travel-title" aria-hidden="true" inert>
+      <div class="folio">
+        <a href="#home" data-route="home" class="back-link">← BACK HOME <span>返回首页</span></a>
+        <header class="folio-heading"><p class="archive-number">05 / PERSONAL ARCHIVE</p><h1 id="travel-title" tabindex="-1">Travel Log</h1><p>去体验不同地域的人和风景</p></header>
+        <ul class="travel-gallery" aria-label="十四座城市的旅行照片">
+          <li class="travel-photo" style="--photo-tilt:-2deg"><figure><img src="assets/travel/Beijing.jpg" alt="Beijing 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Beijing</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.5deg"><figure><img src="assets/travel/Changsha.jpg" alt="Changsha 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Changsha</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.2deg"><figure><img src="assets/travel/Chengdu.jpg" alt="Chengdu 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Chengdu</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:2deg"><figure><img src="assets/travel/Chongqing.jpg" alt="Chongqing 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Chongqing</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.6deg"><figure><img src="assets/travel/Guangzhou.jpg" alt="Guangzhou 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Guangzhou</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.2deg"><figure><img src="assets/travel/Guiyang.jpg" alt="Guiyang 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Guiyang</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.8deg"><figure><img src="assets/travel/Hangzhou.jpg" alt="Hangzhou 旅行照片" width="1079" height="1400" loading="lazy" decoding="async"><figcaption>Hangzhou</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.6deg"><figure><img src="assets/travel/Jiaxing.jpg" alt="Jiaxing 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Jiaxing</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.1deg"><figure><img src="assets/travel/Nanjing.jpg" alt="Nanjing 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Nanjing</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.8deg"><figure><img src="assets/travel/Qingdao.jpg" alt="Qingdao 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Qingdao</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.5deg"><figure><img src="assets/travel/Shanghai.jpg" alt="Shanghai 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Shanghai</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.1deg"><figure><img src="assets/travel/Suzhou.jpg" alt="Suzhou 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Suzhou</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.9deg"><figure><img src="assets/travel/Tianjin.jpg" alt="Tianjin 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Tianjin</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.4deg"><figure><img src="assets/travel/Wuhan.jpg" alt="Wuhan 旅行照片" width="975" height="1300" loading="lazy" decoding="async"><figcaption>Wuhan</figcaption></figure></li>
+        </ul>
+        <footer class="folio-footer"><span>YANGHANG / TRAVEL LOG</span><span class="footer-copy">© 2026 YangHang / Bryce</span><span>14 CITIES</span></footer>
+      </div>
+    </section>
+  </main>
+  <div class="reader" id="reader-001" role="dialog" aria-modal="true" aria-labelledby="reader-001-title" hidden>
+    <div class="reader-backdrop" data-reader-close></div>
+    <div class="reader-panel">
+      <button type="button" class="reader-close" data-reader-close aria-label="关闭文章">✕</button>
+      <div class="reader-scroll" id="reader-001-scroll">
+        <div class="reader-head">
+          <p class="reader-index">THOUGHTS / 001</p>
+          <h2 class="reader-title" id="reader-001-title">母职</h2>
+          <ul class="thought-tags"><li>母职</li><li>女性处境</li><li>精神健康</li><li>音乐与社会</li></ul>
+        </div>
+        <hr class="reader-rule">
+        <p class="reader-nav-label">CONTENTS / QUICK NAVIGATION</p>
+        <nav class="reader-nav" aria-label="文章章节">
+          <button type="button" class="part-link part-1" data-goto="part-1">
+            <span class="part-kicker">PART 01</span>
+            <span class="part-title">Lindsay 案</span>
+            <span class="part-arrow" aria-hidden="true">↓</span>
+          </button>
+          <button type="button" class="part-link part-2" data-goto="part-2">
+            <span class="part-kicker">PART 02</span>
+            <span class="part-title">椎名林檎《葬列》思考</span>
+            <span class="part-arrow" aria-hidden="true">↓</span>
+          </button>
+        </nav>
+        <hr class="reader-rule reader-rule-nav">
+        <section class="part" id="part-1" aria-labelledby="part-1-title">
+          <h3 class="part-heading" id="part-1-title">Part 1 · Lindsay 案</h3>
+          <span class="part-accent" aria-hidden="true"></span>
+          <div class="article-body">
+<p>事件梗概：</p>
+<p>Lindsay Clancy是美国马萨诸塞州的一名产科护士，同时也是三个孩子的母亲。2023年1月24日，在经历了数月严重的产后精神健康危机和反复求医之后，她在家中导致三个孩子死亡，随后试图自杀并因坠楼永久瘫痪。此后的刑事案件核心并不是简单争论孩子是不是她杀的，而是争论她实施行为时是否因严重精神疾病而丧失了法律意义上的刑事责任能力。</p>
+<p>事件经历：</p>
+<p>Lindsay Clancy是一个产科分娩护士，从亲属、朋友和同事的证词来看，她在出现精神健康问题以前长期被视为一个称职的母亲，而且她的职业本身就是照顾产妇和新生儿，这让整个事件很难被解释为一个坏母亲虐待孩子。</p>
+<p>2022年秋天，Lindsay的精神情况恶化，出现了严重焦虑、失眠、自杀想法甚至是伤害孩子的想法，她也向自己的家人告知了自己的极端念头。随后Lindsay多次向医院求助，根据后来庭审材料和媒体对医疗记录的整理，案发前约四个月里，她曾被多个医疗机构和医疗人员接诊，并先后收到<strong> </strong>13 种精神科药物的处方，后面主动入住精神病院。所以她并没有放弃自己和家庭。甚至后面为了想给女儿准备生日主动要求出院。</p>
+<p>案发当晚，根据Lindsay的阐述，当晚她经历了一个Psychotic Moment，听到了一个男人的声音让她杀死孩子杀死自己，因为这是最后的机会。</p>
+<p>我们的关注点并非在Lindsay是否在案发时是否精神病发作，是否有理性，而是案发过后所有的目光都聚集在Lindsay身上，却没有重视作为一个母亲，她经历了什么，社会又是如何回应一个母亲的。</p>
+<p>我在听说了这个事件之后第一想法是，明显患有精神疾病的母亲，在被判无罪之后并不会导致社会违法犯罪事件猖獗，能维持理性意志的人违法后自然会受到审判。如果说把一个理性的人判无罪，那是对其他人违法犯罪的纵容，那把一个母职下精神失常的母亲判有罪，而对社会不加以审判，是否是对社会对母亲的忽视，医院对母亲产后精神病日常化的纵容呢？是否以后所有母亲在承受巨大压力之后仍然不能得到重视？</p>
+<p>为什么我们只审判最后一个崩溃的人？一个人经过几个月甚至几年的恶化，周围可能存在很多制度节点：</p>
+<p>家庭、伴侣、雇主、医疗机构、保险体系、公共卫生服务、育儿支持、社会文化。但事件发生之后，所有注意力突然汇聚到：“这个女人”。</p>
+<p>母亲的痛苦只有在不影响别人时才容易被承认，社会都在说当妈的不容易，但社会允许母亲的是一种特殊的苦难，她可以哭可以累，但是前提是她必须完成母亲的功能，必须继续照顾孩子、爱孩子、保持家庭运转，社会允许母亲痛苦，但不允许母亲的痛苦破坏母职。</p>
+<p>如果最终所有事情仍然被理解成一个女人犯罪了，所以惩罚她，那是不是又告诉其他母亲：</p>
+<p>你可以痛苦，但痛苦是你自己的；你可以生病，但治疗是你自己的责任；你可以求助，但只要系统没有明显违法，它就没有责任；而一旦你最终失控，所有责任又完整地回到你身上。当母职运行正常，这是母爱，社会免费获得照护劳动，当母职令人痛苦，这是个人心理问题，是自己的责任，当母职崩溃，这是个人违法犯罪，社会拿收益，成本归母亲。</p>
+<p>当然，社会有责任不代表个人无责任，个人有责任也不代表社会无责任。社会习惯性直接找责任人直接解决问题。但是飞机失事并不会这么处理，会调查设备、排班、旅客、监管机制等等，因为大家都知道重大事故经常不是一个人所造成的，但是到了母职领域，大家就只会想那就是她的原因。</p>
+<p>一个女人在成为母亲之后，她发生了什么变化：</p>
+<p>身体成为母亲：父亲和母亲并不是以同一种方式成为父母。父亲成为父亲，首先是一种社会身份的变化，母亲成为母亲，却首先经历的是身体边界被重新组织。怀孕的时候是胎儿的生存环境，生产时是医疗对象，哺乳时是营养来源，产后又被要求尽快恢复，恢复生活恢复工作。</p>
+<p>照护成为母亲：孩子出生以后，母亲开始失去的是时间，喂奶、换尿布、做饭、哄睡的身体劳动，穿插在生活中的，需要回应孩子不定时哭泣的碎片化劳动，疫苗什么时候打，尿布够不够用，下周是不是有家长会等各个小事项的精神负载。</p>
+<p>社会意义上的母亲：因为你是女性，所以你需要生孩子，因为你生了孩子，所以你天然应该喜欢照顾孩子，所以你应该愿意牺牲，所以牺牲不是劳动，所以你不应该抱怨，很多事情源于“爱”就不再视为劳动。社会其他劳动都允许人做好工作同时吐槽工作、不喜欢工作，唯独母职不太允许。不会照顾孩子的父亲会被说：“第一次当爸爸嘛”，不会照顾孩子的母亲：“你怎么当妈的”。社会不允许母亲暂时退出。</p>
+<p>社会如何反过来对待母亲：社会承认母亲的苦难，却不承认制造苦难的结构。母爱伟大母爱无私，这是苦难浪漫化。如果母亲撑不住，是她没有调节好，她要学会放松，这是苦难个人化。社会给母亲一个极其狭窄的痛苦空间，或许社会看到了母亲的苦难，但社会允许母亲以什么方式痛苦？母亲对自身苦难的解释权有多少。</p>
+<p>母亲在社会和家庭中承担了很多，但是母亲的苦难却很少被看到。我希望社会和家庭可以在她撑不住的时候接过她的夜晚、她的时间、她的责任与恐惧，而不是留下一句为母则刚，不是简单解释为母亲应该做的。社会不该在母亲失去理智后再问她发生了什么，而是在她还能开口的时候认真听见她的诉求。真正尊重一个母亲，不是赞美她能承受多少，而是让她不必承受那么多。</p>
+          </div>
+        </section>
+        <hr class="reader-rule reader-rule-parts">
+        <section class="part" id="part-2" aria-labelledby="part-2-title">
+          <h3 class="part-heading" id="part-2-title">Part 2 · 椎名林檎《葬列》思考</h3>
+          <span class="part-accent part-accent-2" aria-hidden="true"></span>
+          <div class="article-body">
+<p class="article-deck">椎名林檎《葬列》音乐赏析——女性对被预设的母性宿命的决裂</p>
+<p>当母职被神化为女性的宿命，当生育本身就是一场苦难的轮回，生命的降临究竟是馈赠，还是诅咒？</p>
+<p>2001年，椎名林檎初为人母，在两年后创作了《加尔基》，以宗教开篇，以葬列收尾，表达了自己对于性、身体、生命与轮回的思考。</p>
+<p>葬列的故事线是腹中胎儿带着想要降生的意志向母亲发出请求，母亲选择终止妊娠，生命被抹去。</p>
+<p>歌中提出问题：如果这个世界本就没有桃源乡，那把无辜生命送入这个苦难世界，究竟是不是一种残忍？</p>
+<p>结尾她请求“让我看看你的脸”，是母亲对这个从未出世的孩子最后的凝望与告别，是一场私人的葬礼，也就是歌名葬列。</p>
+<p><strong>母职不是天生本能，而是一套被预设好的社会角色</strong></p>
+<p>--关于葬列这首歌本身，椎名林檎基于自身生命体验，但它也可以被理解为对更广泛女性处境的回应。社会对女性强加了母职使命，女性身体被当成生育容器，而容器是没有自主权利的。母亲必须无私奉献，母亲必须承担相应一切责任，母亲必须会当一个母亲。社会默认女性要承担更多育儿、家务、情绪劳动，当她选择生育，枷锁就落在了她身上。</p>
+<p>而这个使命，对于社会来说，一切都是理所当然。Lindsay案中她爆发严重的产后精神病，长期被无尽育儿劳动、精神耗竭困住，多次求助医疗系统却没有得到足够保护，只得到潦草的诊断和叠加的药物，因为女性产后的精神痛苦容易被日常化，认为是女性应该承担的一部分，但是如果你崩溃、疲惫、不想继续，如果你无法完成无条件爱孩子无限牺牲的预设，那你就是怪物。你有罪，而社会无罪。</p>
+<p><strong>拒绝生育，是否也可能是一种爱</strong><strong>？</strong></p>
+<p>--歌中母亲拒绝生育，她对自己的身体拥有决定权。那她是否不爱自己的孩子？如果这个世界并没有桃花源，是否堕胎也会有爱的体现？常常刷到这样的内容：孩子对母亲说，你如果做不到当时为什么要生下我？但是决定权真的在女性手中吗，如果当时不选择结婚，她会面对社会怎样的非议，如果她当时选择不生育，会受到家人怎样的指责。所以“既然生了就要负责”这句话，往往忽略了她进入婚姻和母职本身可能就不是完全自由的选择，社会不会原谅打破预设的人，因为打破了预设你就是怪物。多数人共情孩子的苦难，原生家庭是太多人可以谈论的话题了，但是没有人去共情母亲的处境，她作为母亲，她作为女性，面对了什么。</p>
+<p>  如果我的诞生会让母亲受到苦难，那我宁愿选择自己从未出生。歌中胎儿也理解了母亲的想法，愿意主动放下自己的出生意志。葬列中母亲预判了母职的重量和世间的苦难，于是选择不让生命开启这场轮回。母亲不愿让孩子来世间受苦，孩子不愿让母亲因自己受累，双方的体谅最终落成了一场葬礼。Lindsay案中这个枷锁彻底地压垮了她，当母职的无限责任、社会的完美要求与漠视、精神的折磨叠加在一起，女性最终在崩溃中走向毁灭性的结局：选择与孩子一同结束生命。</p>
+<p>母职并不是天生本能，母亲的付出与苦难需要被社会看见，似乎无论走哪一条路，女性都站在被审判的位置上。葬列中写道：</p>
+<p data-align="center">未だ何の建設も着工してゐない、 白紙に還す予定です</p>
+<p data-align="center">将尚未动工的建设，回归白纸一张。</p>
+<p>我希望所有女性生来都是一张可以自己自由涂画的白纸，而不是需要你逐一作答每道题目的试卷。</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  <div class="sr-only" id="route-status" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript">请启用 JavaScript，以体验贴纸导航与栏目切换。</p></noscript>
+</body>
+</html>

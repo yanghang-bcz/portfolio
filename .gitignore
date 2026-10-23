@@ -1,0 +1,11 @@
+.DS_Store
+.AppleDouble
+.workbuddy/
+node_modules/
+verification/*.jpg
+verification/*.png
+verification/checks.json
+*.log
+.env
+.env.*
+!.env.example

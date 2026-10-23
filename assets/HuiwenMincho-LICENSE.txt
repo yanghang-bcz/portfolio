@@ -1,0 +1,56 @@
+Huiwen Mincho (汇文明朝体) — License & Provenance
+==================================================
+
+Font name
+  Huiwen-mincho / 汇文明朝体
+  Version 1.00 (January 14, 2021)
+
+Original author
+  Terry Wang (特里王)
+  Glyphs derived from scanned documents of the 1950s–60s Chinese character
+  reform publications, including the "汉字简化方案草案" printed in 文汇报.
+  Style: period letterpress / 旧铅字印刷.
+
+Upstream used here
+  huiwenmincho-improved by bosswnx
+  https://github.com/bosswnx/huiwenmincho-improved
+  Release 20241203
+
+License
+  CC0 1.0 Universal (Public Domain Dedication)
+  https://creativecommons.org/publicdomain/zero/1.0/
+
+  The font file also carries `Copyright: Public Domain` in its own name table
+  (nameID 0).
+
+  The original release inherits the usage statement of the Oradano Mincho
+  typeface it was built on:
+
+    This font may be used freely for printing, display, and embedding in
+    electronic documents and devices. It may be redistributed freely. It may be
+    sold as part of a larger software package. It may be used to develop new
+    fonts. The font file itself may not be resold on its own as a commodity.
+
+  Commercial use, web embedding and modification are all permitted.
+
+Modifications made for this project
+  Both changes below are permitted by CC0 1.0.
+
+  1. Subset to the 3,500 most common simplified Chinese characters plus
+     Latin, digits and punctuation, converted to WOFF2.
+     Source: 24.8 MB TTF -> 2.1 MB WOFF2.
+
+  2. The three punctuation glyphs below were translated inside their em box so
+     that they sit at the lower-left corner, the Chinese convention, instead of
+     the centre, which is the Japanese convention used by the upstream font.
+     No other outline data was altered.
+
+       U+3002 。  moved (-262, -186)   box 361,215,702,533 -> 99,29,440,347
+       U+FF0C ，  moved (-286, -150)
+       U+3001 、  moved (-278, -178)
+
+     The upstream font has no `locl` feature, so the browser cannot switch
+     punctuation position by language tag; the outlines themselves had to move.
+
+Files
+  assets/HuiwenMincho-Regular-subset.woff2   web font actually loaded by the page

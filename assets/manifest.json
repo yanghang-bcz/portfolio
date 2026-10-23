@@ -1,0 +1,240 @@
+{
+  "source": "https://www.figma.com/design/1wVwG7jsZviOSTYVnMrbFs/Untitled?node-id=6-2",
+  "assets": {
+    "paper": {
+      "file": "paper.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/f7748.png",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB",
+      "alphaBounds": null
+    },
+    "engineering": {
+      "file": "engineering.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/9b049.png",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        1536,
+        1024
+      ]
+    },
+    "photo-back": {
+      "file": "photo-back.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/b29f6.png",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        17,
+        1450,
+        1024
+      ]
+    },
+    "photo-front": {
+      "file": "photo-front.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/29f87.png",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        1620,
+        941
+      ]
+    },
+    "astronaut": {
+      "file": "astronaut.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/20020.png",
+      "width": 1275,
+      "height": 1234,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        1271,
+        1234
+      ]
+    },
+    "orbit-a": {
+      "file": "orbit-a.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/6d094.png",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGBA",
+      "alphaBounds": [
+        285,
+        319,
+        1639,
+        771
+      ]
+    },
+    "orbit-b": {
+      "file": "orbit-b.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/403da.png",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGBA",
+      "alphaBounds": [
+        43,
+        21,
+        1660,
+        868
+      ]
+    },
+    "plane": {
+      "file": "plane.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/00496.png",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        9,
+        1522,
+        1024
+      ]
+    },
+    "mac": {
+      "file": "mac.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/76c9e.png",
+      "width": 683,
+      "height": 473,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        683,
+        473
+      ]
+    },
+    "radio": {
+      "file": "radio.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/e673d.png",
+      "width": 746,
+      "height": 512,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        0,
+        746,
+        512
+      ]
+    },
+    "bulb": {
+      "file": "bulb.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/163e6.png",
+      "width": 396,
+      "height": 475,
+      "mode": "RGBA",
+      "alphaBounds": [
+        1,
+        0,
+        396,
+        475
+      ]
+    },
+    "id": {
+      "file": "id.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/66d79.png",
+      "width": 650,
+      "height": 537,
+      "mode": "RGBA",
+      "alphaBounds": [
+        0,
+        1,
+        650,
+        537
+      ]
+    },
+    "welcome": {
+      "file": "welcome.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/cf7c5.png",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGBA",
+      "alphaBounds": [
+        25,
+        69,
+        2156,
+        676
+      ]
+    },
+    "logo": {
+      "file": "logo.png",
+      "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/8f474.png",
+      "width": 2079,
+      "height": 756,
+      "mode": "RGBA",
+      "alphaBounds": [
+        15,
+        7,
+        2033,
+        756
+      ]
+    },
+    "photo-bamboo": {
+      "file": "photo-bamboo.jpg",
+      "source": "user-supplied: fxn 2026-03-31 15360252D7DBC8D30A.JPG",
+      "width": 640,
+      "height": 854,
+      "mode": "RGB",
+      "alphaBounds": null
+    },
+    "photo-selfie": {
+      "file": "photo-selfie.jpg",
+      "source": "user-supplied: IMG_5529.jpg",
+      "width": 480,
+      "height": 640,
+      "mode": "RGB",
+      "alphaBounds": null
+    },
+    "music-note-a": {
+      "file": "music-note-a.png",
+      "source": "user-supplied: 撕纸拼贴风音乐八分音符.png",
+      "width": 165,
+      "height": 260,
+      "mode": "RGBA",
+      "alphaBounds": null,
+      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留"
+    },
+    "music-note-b": {
+      "file": "music-note-b.png",
+      "source": "user-supplied: 复古撕纸八分音符贴纸2.png",
+      "width": 180,
+      "height": 260,
+      "mode": "RGBA",
+      "alphaBounds": null,
+      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留"
+    },
+    "music-note-pair": {
+      "file": "music-note-pair.png",
+      "source": "user-supplied: 复古撕纸八分音符贴纸4.png",
+      "width": 243,
+      "height": 260,
+      "mode": "RGBA",
+      "alphaBounds": null,
+      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留"
+    },
+    "music-gramophone": {
+      "file": "music-gramophone.png",
+      "source": "user-supplied: 复古留声机撕纸贴纸拼贴.png",
+      "width": 218,
+      "height": 260,
+      "mode": "RGBA",
+      "alphaBounds": null,
+      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留"
+    }
+  },
+  "font": {
+    "file": "SpecialElite-Regular.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/apache/specialelite/SpecialElite-Regular.ttf",
+    "license": "Apache-2.0",
+    "licenseFile": "SpecialElite-LICENSE.txt"
+  }
+}
