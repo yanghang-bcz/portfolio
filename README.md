@@ -36,6 +36,16 @@ python3 -m http.server 4173 --bind 127.0.0.1
 
 回归里为此加了 4 条断言（`verification/check.html`），其中一条用一个故意不存在的路径验证「重试到第 3 次就停」。
 
+## 图片格式：PNG → WebP（保留 PNG 可回退）
+
+首屏需要下载的位图有 22 张，原先是 18.13 MB 的 PNG。同参数转成 WebP（`quality=82, method=6`）后是 2.36 MB，**减少 87.0%**，冷缓存首次访问的总传输量从 26.16 MB 降到 10.62 MB（**-59.4%**）。
+
+- 转换**只改容器**：像素尺寸、RGBA 通道、画面内容逐张校验一致，没有重新采样、没有改尺寸、没有动配色和排版。
+- 撕纸边缘和颗粒是重点核对对象：把 PNG 与 WebP 都合成到棋盘格底上做差分，边缘处最大偏差 14–35/255，均值 1.15–1.92，超过 6/255 的像素不超过 4.42%，与转换前的 /tmp 预验证完全一致。
+- 原始 PNG **全部保留**在 `assets/` 下，回退只需把 `index.html` / `style.css` 里的 `.webp` 改回 `.png`。
+- JPEG（照片与唱片封面）本次不动：重新编码只省 3%，且有 6 张反而变大。
+- `assets/manifest.json` 里每条都记了 `pngOriginal` 与 `derivedFrom`，方便追溯。
+
 ## 文件
 
 - `index.html`：页面与内容。
@@ -44,7 +54,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - `app.js`：导航及首页动画。
 - `music.js`：唱片数据与交互。
 - `reader.js`：文章阅读弹层。
-- `assets/`：实际使用的图片、字体及许可证；`manifest.json` 保留素材来源记录。
+- `assets/`：实际使用的图片、字体及许可证；`manifest.json` 保留素材来源记录。位图以 `.webp` 为准，同名 `.png` 为回退用原件。
 - `verification/check.html`、`verification/run-checks.mjs`：开发检查工具，当前 117 条断言全部通过；运行需要另行安装 Node.js 和 playwright-core。截图及生成的检查结果不提交。
 
 ## 素材与署名

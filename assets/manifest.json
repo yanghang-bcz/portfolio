@@ -2,15 +2,17 @@
   "source": "https://www.figma.com/design/1wVwG7jsZviOSTYVnMrbFs/Untitled?node-id=6-2",
   "assets": {
     "paper": {
-      "file": "paper.png",
+      "file": "paper.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/f7748.png",
       "width": 1920,
       "height": 1080,
       "mode": "RGB",
-      "alphaBounds": null
+      "alphaBounds": null,
+      "pngOriginal": "paper.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "engineering": {
-      "file": "engineering.png",
+      "file": "engineering.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/9b049.png",
       "width": 1536,
       "height": 1024,
@@ -20,10 +22,12 @@
         0,
         1536,
         1024
-      ]
+      ],
+      "pngOriginal": "engineering.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "photo-back": {
-      "file": "photo-back.png",
+      "file": "photo-back.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/b29f6.png",
       "width": 1536,
       "height": 1024,
@@ -33,10 +37,12 @@
         17,
         1450,
         1024
-      ]
+      ],
+      "pngOriginal": "photo-back.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "photo-front": {
-      "file": "photo-front.png",
+      "file": "photo-front.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/29f87.png",
       "width": 1672,
       "height": 941,
@@ -46,10 +52,12 @@
         0,
         1620,
         941
-      ]
+      ],
+      "pngOriginal": "photo-front.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "astronaut": {
-      "file": "astronaut.png",
+      "file": "astronaut.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/20020.png",
       "width": 1275,
       "height": 1234,
@@ -59,10 +67,12 @@
         0,
         1271,
         1234
-      ]
+      ],
+      "pngOriginal": "astronaut.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "orbit-a": {
-      "file": "orbit-a.png",
+      "file": "orbit-a.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/6d094.png",
       "width": 1920,
       "height": 1080,
@@ -72,10 +82,12 @@
         319,
         1639,
         771
-      ]
+      ],
+      "pngOriginal": "orbit-a.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "orbit-b": {
-      "file": "orbit-b.png",
+      "file": "orbit-b.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/403da.png",
       "width": 1672,
       "height": 941,
@@ -85,10 +97,12 @@
         21,
         1660,
         868
-      ]
+      ],
+      "pngOriginal": "orbit-b.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "plane": {
-      "file": "plane.png",
+      "file": "plane.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/00496.png",
       "width": 1536,
       "height": 1024,
@@ -98,10 +112,12 @@
         9,
         1522,
         1024
-      ]
+      ],
+      "pngOriginal": "plane.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "mac": {
-      "file": "mac.png",
+      "file": "mac.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/76c9e.png",
       "width": 683,
       "height": 473,
@@ -111,10 +127,12 @@
         0,
         683,
         473
-      ]
+      ],
+      "pngOriginal": "mac.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "radio": {
-      "file": "radio.png",
+      "file": "radio.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/e673d.png",
       "width": 746,
       "height": 512,
@@ -124,10 +142,12 @@
         0,
         746,
         512
-      ]
+      ],
+      "pngOriginal": "radio.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "bulb": {
-      "file": "bulb.png",
+      "file": "bulb.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/163e6.png",
       "width": 396,
       "height": 475,
@@ -137,10 +157,12 @@
         0,
         396,
         475
-      ]
+      ],
+      "pngOriginal": "bulb.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "id": {
-      "file": "id.png",
+      "file": "id.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/66d79.png",
       "width": 650,
       "height": 537,
@@ -150,10 +172,12 @@
         1,
         650,
         537
-      ]
+      ],
+      "pngOriginal": "id.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "welcome": {
-      "file": "welcome.png",
+      "file": "welcome.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/cf7c5.png",
       "width": 2172,
       "height": 724,
@@ -163,10 +187,12 @@
         69,
         2156,
         676
-      ]
+      ],
+      "pngOriginal": "welcome.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "logo": {
-      "file": "logo.png",
+      "file": "logo.webp",
       "source": "https://www.figma.com/api/mcp/asset/d03c3ac4-0a93-4ddf-975f-ab9c41141e9f/8f474.png",
       "width": 2079,
       "height": 756,
@@ -176,7 +202,9 @@
         7,
         2033,
         756
-      ]
+      ],
+      "pngOriginal": "logo.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "photo-bamboo": {
       "file": "photo-bamboo.jpg",
@@ -195,40 +223,48 @@
       "alphaBounds": null
     },
     "music-note-a": {
-      "file": "music-note-a.png",
+      "file": "music-note-a.webp",
       "source": "user-supplied: 撕纸拼贴风音乐八分音符.png",
       "width": 165,
       "height": 260,
       "mode": "RGBA",
       "alphaBounds": null,
-      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留"
+      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留",
+      "pngOriginal": "music-note-a.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "music-note-b": {
-      "file": "music-note-b.png",
+      "file": "music-note-b.webp",
       "source": "user-supplied: 复古撕纸八分音符贴纸2.png",
       "width": 180,
       "height": 260,
       "mode": "RGBA",
       "alphaBounds": null,
-      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留"
+      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留",
+      "pngOriginal": "music-note-b.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "music-note-pair": {
-      "file": "music-note-pair.png",
+      "file": "music-note-pair.webp",
       "source": "user-supplied: 复古撕纸八分音符贴纸4.png",
       "width": 243,
       "height": 260,
       "mode": "RGBA",
       "alphaBounds": null,
-      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留"
+      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留",
+      "pngOriginal": "music-note-pair.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     },
     "music-gramophone": {
-      "file": "music-gramophone.png",
+      "file": "music-gramophone.webp",
       "source": "user-supplied: 复古留声机撕纸贴纸拼贴.png",
       "width": 218,
       "height": 260,
       "mode": "RGBA",
       "alphaBounds": null,
-      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留"
+      "note": "白底在导出时抠成透明：只去掉与图边相连的近白，撕纸边缘保留",
+      "pngOriginal": "music-gramophone.png",
+      "derivedFrom": "png → WebP quality=82 (method=6), 尺寸/透明通道/画面内容不变"
     }
   },
   "font": {
@@ -236,5 +272,13 @@
     "source": "https://raw.githubusercontent.com/google/fonts/main/apache/specialelite/SpecialElite-Regular.ttf",
     "license": "Apache-2.0",
     "licenseFile": "SpecialElite-LICENSE.txt"
+  },
+  "derived": {
+    "webp": {
+      "date": "2026-10-24",
+      "tool": "Pillow 12.3 (quality=82, method=6)",
+      "count": 18,
+      "note": "页面引用改为 .webp；原 PNG 全部保留在 assets/ 下以便回退。manifest 中 file 指向实际使用的文件，pngOriginal 为原文件。"
+    }
   }
 }

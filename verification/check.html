@@ -131,7 +131,13 @@ const tagItems=[...d.querySelectorAll('#about .tag-item')];
 await Promise.all(tagItems.map(it=>{const img=it.querySelector('img');return img.complete?0:img.decode().catch(()=>{})}));await wait(200);
 const expectedTags=['ENFJ 主人公','17375051324@163.com','github.com/yanghang-bcz','Shanghai'];
 check('About lists four field tags after the intro',tagItems.length===4&&d.querySelector('#about .field-tags')?.previousElementSibling?.tagName==='P');
-check('Tag labels are loaded transparent PNGs',tagItems.every(it=>{const img=it.querySelector('img');return img.complete&&img.naturalWidth>0&&img.src.endsWith('.png');}),tagItems.map(it=>it.querySelector('img').src.split('/').pop()));
+// 格式无关：第一阶段已把 PNG 换成 WebP（尺寸/透明通道/画面不变），所以不再断言扩展名，
+// 改成真去读 alpha 通道——撕纸标签必须是带透明的位图，糊掉的纯色矩形会在这里挂掉。
+check('Tag labels load as images with a real alpha channel',tagItems.every(it=>{const img=it.querySelector('img');if(!(img.complete&&img.naturalWidth>0))return false;
+  const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+  const x=c.getContext('2d');x.drawImage(img,0,0);const d=x.getImageData(0,0,c.width,c.height).data;
+  let transparent=0;for(let i=3;i<d.length;i+=4)if(d[i]<250)transparent++;
+  return transparent>c.width*c.height*0.02;}),tagItems.map(it=>it.querySelector('img').src.split('/').pop()));
 check('Each tag is followed by its value',JSON.stringify(tagItems.map(it=>it.querySelector('.tag-value').textContent))===JSON.stringify(expectedTags),tagItems.map(it=>it.querySelector('.tag-value').textContent));
 const tagCols=w.getComputedStyle(d.querySelector('#about .field-tags')).gridTemplateColumns.split(' ').length;
 check('Field tags form a 2×2 grid on desktop',tagCols===2&&new Set(tagItems.map(it=>Math.round(rect(it).y))).size===2,{columns:tagCols});
