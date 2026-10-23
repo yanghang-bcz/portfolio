@@ -268,6 +268,13 @@ const nBox=rect(d.querySelector('#about .about-photos')),nTags=rect(d.querySelec
 check('1024px: the pair drops into the flow right under the tags, flush left',
   Math.round(nBox.x)===Math.round(nTags.x)&&nBox.y>nTags.y+nTags.h&&nBox.y-(nTags.y+nTags.h)<40&&d.documentElement.scrollWidth===1024,
   {box:nBox,tags:nTags});
+// —— 资源自愈：连接被掐断后要自己重试（GitHub Pages 上会偶发 net::ERR_CONNECTION_CLOSED）——
+const ghost=d.createElement('img');ghost.style.display='none';ghost.alt='';ghost.src='../assets/__qa-missing__.png';d.body.appendChild(ghost);
+check('A failed image is retried with a cache-busting query',await until(()=>/retry=1/.test(ghost.getAttribute('src')||''),4000),{src:ghost.getAttribute('src')});
+check('Retries climb to three and then stop',await until(()=>/retry=3/.test(ghost.getAttribute('src')||''),14000),{src:ghost.getAttribute('src')});
+await wait(4200);
+check('A permanently missing file stops retrying instead of looping',/retry=3/.test(ghost.getAttribute('src')||'')&&ghost.complete&&ghost.naturalWidth===0,{src:ghost.getAttribute('src')});
+check('Every declared font face has finished loading',[...d.fonts].every(f=>f.status==='loaded'),[...d.fonts].map(f=>`${f.family.replace(/"/g,'')}:${f.status}`));
 document.body.dataset.done='true';document.body.dataset.passed=results.every(r=>r.pass)?'true':'false';
  output.textContent=JSON.stringify({passed:results.filter(r=>r.pass).length,total:results.length,results},null,2);
 })().catch(error=>{document.querySelector('#result').textContent=error.stack;document.body.dataset.done='true';document.body.dataset.passed='false'});
