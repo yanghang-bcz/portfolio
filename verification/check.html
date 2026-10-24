@@ -17,6 +17,10 @@
  // 所以这里只看真的发起了加载的那些（有 src 的）。
  const eagerImgs=[...d.images].filter(i=>i.loading!=='lazy'&&i.getAttribute('src'));
  check('Every eagerly loaded image asset resolved',eagerImgs.length>=13&&eagerImgs.every(i=>i.complete&&i.naturalWidth>0),{count:eagerImgs.length,broken:eagerImgs.filter(i=>!i.complete||!i.naturalWidth).map(i=>i.getAttribute('src'))});
+// 阶段二：AVIF 优先。Chrome 支持 AVIF，所以首页每一张都必须真的走到 .avif，
+// 走不到就说明 <source> 写错或文件 404（那种情况会静默退回 fallback，看着没事但其实白多存一份）。
+ const homeSrc=[...d.querySelectorAll('#home img')].map(i=>i.currentSrc||i.src);
+ check('Home renders from AVIF, not the fallback',homeSrc.length>=13&&homeSrc.every(s=>/\.avif(\?|$)/.test(s)),{srcs:homeSrc.map(s=>s.split('/').pop())});
 // 首访只该拿首页的东西。Music / Travel 一个字节都不该发出去。
  const resNames=()=>w.performance.getEntriesByType('resource').map(e=>e.name);
  check('Tiered loading: first Home paint requests no Music or Travel asset',
@@ -160,7 +164,7 @@ const printBase=d.querySelector('#about .photo-print--base'),printTop=d.querySel
 const tilt=el=>{const m=new w.DOMMatrixReadOnly(w.getComputedStyle(el).transform);return Math.round(Math.atan2(m.b,m.a)*1800/Math.PI)/10;};
 const pb=rect(printBase),pt=rect(printTop),intro=rect(d.querySelector('.about-entry > p:not(.category)')),aboutFolio=rect(d.querySelector('#about .folio'));
 const ovl={w:Math.round(Math.min(pb.x+pb.w,pt.x+pt.w)-Math.max(pb.x,pt.x)),h:Math.round(Math.min(pb.y+pb.h,pt.y+pt.h)-Math.max(pb.y,pt.y))};
-check('About holds both photos as real loaded assets',[printBase,printTop].every(f=>{const i=f.querySelector('img');return i.complete&&i.naturalWidth>0&&/photo-(bamboo|selfie)\.jpg$/.test(i.getAttribute('src'));}),[printBase,printTop].map(f=>f.querySelector('img').getAttribute('src')));
+check('About holds both photos as real loaded assets',[printBase,printTop].every(f=>{const i=f.querySelector('img');return i.complete&&i.naturalWidth>0&&/photo-(bamboo|selfie)\.(jpe?g|webp|avif)$/.test(i.currentSrc||i.getAttribute('src')||'');}),[printBase,printTop].map(f=>f.querySelector('img').getAttribute('src')));
 check('The selfie sits on top and bites into the bamboo shot’s top-left',Number(w.getComputedStyle(printTop).zIndex)>Number(w.getComputedStyle(printBase).zIndex)&&ovl.w>100&&ovl.h>120,{overlap:ovl,z:[w.getComputedStyle(printBase).zIndex,w.getComputedStyle(printTop).zIndex]});
 check('The two prints lean opposite ways, not onto a grid',tilt(printBase)<-1&&tilt(printTop)>1,{base:tilt(printBase),top:tilt(printTop)});
 check('On desktop the pair sits in the right margin, clear of the text',

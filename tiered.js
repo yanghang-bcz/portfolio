@@ -97,6 +97,7 @@
         img.loading = 'eager';
         img.src = url;
         img.removeAttribute('data-src');
+        img.removeAttribute('data-avif');
       }
       return;
     }
@@ -104,6 +105,7 @@
       img.loading = 'eager';
       img.src = url;
       img.removeAttribute('data-src');
+      img.removeAttribute('data-avif');
     }
     if (source) source.remove();          // 不支持 AVIF 时这个 <source> 已经没有意义
   }
@@ -122,8 +124,12 @@
   }
 
   async function loadUnit(unit, globalAVIF) {
-    const useAVIF = globalAVIF && !!unit.source && !!unit.source.dataset.srcset;
-    const url = useAVIF ? unit.source.dataset.srcset : (unit.img ? unit.img.dataset.src : null);
+    // 地址优先取 img[data-avif]（内页的常规挂法），其次 <picture> 里的 source[data-srcset]。
+    const avifURL = unit.img && unit.img.dataset.avif
+      ? unit.img.dataset.avif
+      : (unit.source ? unit.source.dataset.srcset : null);
+    const useAVIF = globalAVIF && !!avifURL;
+    const url = useAVIF ? avifURL : (unit.img ? unit.img.dataset.src : null);
     if (!url) return;
 
     let settled = false;
@@ -155,7 +161,8 @@
   async function run(page, id) {
     const units = collect(page);
     if (!units.length) { seen.add(id); return; }
-    const globalAVIF = units.some(u => u.source && u.source.dataset.srcset) ? await wantAVIF() : false;
+    const wantsAVIF = units.some(u => (u.img && u.img.dataset.avif) || (u.source && u.source.dataset.srcset));
+    const globalAVIF = wantsAVIF ? await wantAVIF() : false;
     await Promise.all(units.map(unit => loadUnit(unit, globalAVIF)));
     seen.add(id);
     root.dataset.tierReady = id;
