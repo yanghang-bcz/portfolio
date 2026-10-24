@@ -9,6 +9,499 @@
   <link rel="preload" href="assets/SpecialElite-Regular.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="assets/HuiwenMincho-Regular.min.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
+  <!-- 开屏：样式与脚本都内联在这里，和首屏同时出现。
+       做成外部文件（尤其是 defer 脚本）会排在字体 preload 后面，
+       慢速网络下用户会先看到首页、再被盖一层，那就是闪一下。 -->
+  <style>
+/* 开屏：一本摊开的私人收藏册 / 旅行手记的扉页。
+ * 只复用站点已有素材（paper.webp、logo.webp）与已有字体，不引入新字体/视频/GIF。
+ * 这段样式会内联进 index.html 的 <head>：开屏必须和首屏同时出现，
+ * 不能等任何外部文件，否则用户会先看到首页、再被盖上一层，那是闪一下。
+ */
+.splash {
+  position: fixed;
+  inset: 0;
+  /* 200：压住 .skip-link(100) 与 .quick-nav(50)。开屏是这一层里最上面的。 */
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* --paper 由 style.css 定义；这段样式比 style.css 先落地，所以带字面回退值，
+     避免样式表还没到的那一瞬开屏是透明的。 */
+  background: var(--paper, #eee5d2) url("assets/paper.webp") center/cover no-repeat;
+  color: #3a332a;
+  font-family: "Huiwen Mincho", "Songti SC", serif;
+  text-align: center;
+  padding: 24px;
+}
+.splash[hidden] { display: none; }
+
+.splash-card {
+  position: relative;
+  max-width: 560px;
+  width: 100%;
+  padding: 48px 40px 40px;
+  /* 扉页纸感：内描边 + 极轻投影，不改变站点任何既有视觉 */
+  border: 1px solid rgba(58, 51, 42, .28);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset, 0 18px 40px -28px rgba(58, 51, 42, .55);
+  background: linear-gradient(180deg, rgba(255, 253, 247, .72), rgba(255, 253, 247, .38));
+}
+/* 装订线：左侧一道，暗示手记装订 */
+.splash-card::before {
+  content: "";
+  position: absolute;
+  left: 14px; top: 22px; bottom: 22px;
+  width: 1px;
+  background: repeating-linear-gradient(180deg, rgba(58,51,42,.5) 0 5px, transparent 5px 11px);
+}
+
+.splash-kicker {
+  margin: 0 0 18px;
+  font-family: "Special Elite", "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: #6b6152;
+}
+/* logo 走 <picture>（avif 优先、webp 兜底）。style.css 里有全局 picture{display:contents}，
+   这里用更具体的选择器把它改回块级，img 的 margin:0 auto 才有东西可居中。 */
+.splash picture { display: block; }
+.splash-logo {
+  display: block;
+  width: min(300px, 62vw);
+  /* 显式高宽比：图片到位前就占好位置，开屏自身不引入布局抖动 */
+  aspect-ratio: 980 / 356;
+  height: auto;
+  margin: 0 auto 6px;
+}
+.splash-rule {
+  width: 120px; height: 1px;
+  margin: 20px auto 22px;
+  background: linear-gradient(90deg, transparent, rgba(58,51,42,.55), transparent);
+}
+.splash-title {
+  margin: 0 0 10px;
+  font-size: clamp(20px, 4.4vw, 27px);
+  font-weight: 400;
+  letter-spacing: .1em;
+  line-height: 1.6;
+  min-height: 1.6em;
+  text-wrap: balance;
+}
+.splash-sub {
+  margin: 0 0 26px;
+  font-size: 13px;
+  letter-spacing: .16em;
+  color: #6b6152;
+  line-height: 1.9;
+  min-height: 3.8em;
+}
+.splash-sub em { font-style: normal; font-family: "Special Elite", monospace; }
+/* 中文那一行单独成块，才轮得到 balance 去均衡两行。
+   挂在 <p> 上没用：<br> 是硬断行，balance 只会在最后一段里空出孤字。 */
+.splash-sub-zh {
+  display: block;
+  text-wrap: balance;
+}
+
+/* 进度：一道细线 + 一行小字，不抢视线。它是提示，不是闸门。 */
+.splash-progress {
+  margin: 0 auto 22px;
+  width: min(260px, 70vw);
+}
+.splash-track {
+  height: 2px;
+  background: rgba(58, 51, 42, .16);
+  overflow: hidden;
+}
+.splash-fill {
+  height: 100%;
+  width: 0%;
+  background: #7a6a4f;
+  transition: width .25s ease-out;
+}
+.splash-status {
+  margin: 9px 0 0;
+  font-family: "Special Elite", monospace;
+  font-size: 10px;
+  letter-spacing: .22em;
+  color: #857a68;
+  text-transform: uppercase;
+  min-height: 14px;
+}
+
+/* 窄屏防抖：webfont 到位前后，副标题会从 4 行变 3 行（回退字体更宽），
+   卡片高度随之变化 26px，居中的卡片整体下移 13px → CLS 0.032。
+   两个 min-height 把"换行数变化"从布局里摘出去。 */
+@media (max-width: 560px) {
+  .splash-title { min-height: 3.2em; }
+  .splash-sub { min-height: 8em; }
+}
+
+/* 进入按钮：出现即可点，没有 disabled 这回事。
+   未就绪时点它，它会变成 Loading... 并自己走完，不需要点第二次。 */
+.splash-enter {
+  appearance: none;
+  border: 1px solid rgba(58, 51, 42, .45);
+  background: rgba(255, 253, 247, .55);
+  color: #3a332a;
+  font-family: "Special Elite", "Courier New", monospace;
+  font-size: 12px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  padding: 13px 26px 12px;
+  min-width: 208px;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+}
+/* 键盘聚焦沿用站点既有的虚线描边（.satellite:focus-visible 那套），
+   不把按钮整个反色——反色留给 hover，两者才分得清。
+   按钮一出现就 focus()，若用反色做焦点态，首屏永远是深色块。 */
+.splash-enter:hover {
+  background: #3a332a;
+  color: #f3ecdd;
+  border-color: #3a332a;
+}
+.splash-enter:focus-visible {
+  outline: 2px dashed #554c3e;
+  outline-offset: 4px;
+}
+.splash-enter:active { transform: translateY(1px); }
+.splash-enter .zh {
+  display: block;
+  margin-top: 5px;
+  font-family: "Huiwen Mincho", serif;
+  font-size: 11px;
+  letter-spacing: .3em;
+  opacity: .75;
+}
+/* 等待态：位置、尺寸都不动，只换字，避免按钮跳动。
+   这里必须把 hover / focus-visible 一起按住，否则「等的时候」按钮还在反色。
+   边框改成透明而不是虚线：焦点环本身就是一圈虚线，两个虚线框叠在一起太吵。
+   所以等待态看起来是「一圈虚线里一个空框」——still waiting，但只有一个框。 */
+.splash-enter.is-loading,
+.splash-enter.is-loading:hover,
+.splash-enter.is-loading:focus-visible {
+  cursor: progress;
+  background: rgba(255, 253, 247, .35);
+  color: #3a332a;
+  border-color: transparent;
+  outline-offset: 4px;
+}
+
+/* 退出：整页淡出 + 极轻微后退，不逐张贴纸弹出。
+   注意退场不占等待时间：leave() 在动画开始前就已经撤掉命中区域、解开滚动、
+   把焦点交回页面，首页在动画第一帧就是可用的。 */
+.splash.is-leaving { animation: splash-out .38s cubic-bezier(.4, 0, .2, 1) both; pointer-events: none; }
+@keyframes splash-out {
+  to { opacity: 0; transform: scale(1.015); }
+}
+/* 入场只让卡片位移，不改整层的透明度：整层从第一帧就是不透明的纸面，
+   否则用户会先看到首页、再被盖上一层，那就是闪一下。 */
+.splash.is-entering .splash-card { animation: splash-card-in .45s cubic-bezier(.4, 0, .2, 1) both; }
+@keyframes splash-card-in {
+  from { transform: translateY(8px); }
+  to   { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash, .splash.is-leaving, .splash-card { animation: none !important; }
+  .splash-fill { transition: none; }
+  .splash-enter { transition: none; }
+}
+  </style>
+  <script>
+/* 开屏逻辑。内联在 <head> 里，和首屏同时出现。
+ *
+ * 三条规则：
+ *   1. ENTER 从出现的第一刻就可点。没有 disabled、没有"全部下完才解锁"。
+ *   2. 点了但还没就绪 → 原按钮变成 Loading...，继续加载，就绪后自动进入，不需要点第二次。
+ *   3. 资源失败会重试；重试仍失败就算这个任务结束（降级进入），永远不把人卡住。
+ *
+ * 就绪 = 首页那 13 张图解码完成 + 纸纹 + 首页真正用到的 2 个字体 + 交互脚本跑起来。
+ * 首页可见文字只用到 "Special Elite" 与 "Huiwen Mincho"，另外四个 latin 字体是内页
+ * 文字触发的，不该拖住进入。
+ *
+ * 计时用绝对时间线标记，不和外部的 FCP/LCP 混为一谈：
+ *   splash_mounted   开屏真正上屏
+ *   ready_at         资源就绪（不论用户点没点）
+ *   enter_click      用户点 ENTER
+ *   enter_done       开屏移除、首页可交互
+ *   enter_wait_ms    enter_done - enter_click，这才是"点完等了多久"
+ */
+(() => {
+  'use strict';
+
+  const root = document.documentElement;
+  const media = matchMedia('(prefers-reduced-motion: reduce)');
+  const SESSION_KEY = 'portfolio-splash-seen';
+
+  try {
+    if (sessionStorage.getItem(SESSION_KEY)) return;   // 同一会话不拦第二遍
+  } catch (e) { /* 隐私模式会抛错，照常显示 */ }
+
+  const t0 = performance.now();
+  const marks = {};
+
+  const P0_FONTS = [
+    { spec: '400 16px "Special Elite"', sample: 'Enter my world' },
+    { spec: '400 16px "Huiwen Mincho"', sample: '欢迎来到我的小小宇宙' }
+  ];
+  const MAX_RETRY = 3;
+  const DELAY = [500, 1500, 3500];
+  const TASK_TIMEOUT = 20000;        // 单个任务最长等待，超了算失败，绝不无限期挂着
+  const BROKEN_GRACE = 6500;         // 已报错的图：等 assets.js 走完 500/1500/3500 三次重试再放弃
+
+  const state = new Map();
+  let ready = false, clicked = false, waited = false, done = false;
+  let imagesQueued = false;          // 首页图片的任务要等 DOM 出来才登记得出来
+  let splash = null, btn = null, label = null, sub = null, fill = null, status = null;
+  let prevOverflow = '';
+
+  // 先把已知任务落地，再去加载。否则第一帧 render() 时 state 是空的，
+  // 总数为 0 会被当成 100%——开屏一出现就写着「100%」却还要等好几秒。
+  // 图片任务不在这里登记：要等 body 解析完才知道首页到底是哪几张 <img>。
+  state.set('paper', 'pending');
+  P0_FONTS.forEach((f, i) => state.set('font:' + i, 'pending'));
+  state.set('css', 'pending');
+  state.set('dom', 'pending');
+
+  function settle(id, result) {
+    if (state.get(id) !== 'pending') return;      // 只认第一次结论
+    state.set(id, result);
+    render();
+  }
+
+  function render() {
+    const total = state.size;
+    let settled = 0;
+    for (const v of state.values()) if (v !== 'pending') settled += 1;
+    const pct = total ? Math.round(settled / total * 100) : 0;
+    if (fill) fill.style.width = pct + '%';
+    if (status && !done) status.textContent = ready ? 'READY' : 'BINDING THE ARCHIVE ' + pct + '%';
+    // imagesQueued 这个闸门不能省：DOMContentLoaded 一到，dom/css/paper 可能已经齐了，
+    // 此时图片任务还没登记，settled>=total 会被当成"全好了"而提前放人进去。
+    if (total && settled >= total && !ready && imagesQueued) {
+      ready = true;
+      marks.ready_at = +performance.now().toFixed(1);
+      if (clicked) leave();                        // 已经点过，就地进入
+    }
+  }
+
+  function withDeadline(id, factory) {
+    return Promise.race([
+      factory(),
+      new Promise(resolve => setTimeout(() => resolve('__timeout__'), TASK_TIMEOUT))
+    ]).then(
+      v => settle(id, v === '__timeout__' ? 'failed' : 'ok'),
+      () => settle(id, 'failed')          // 重试用尽：算这个任务结束，不放任 unhandledrejection
+    );
+  }
+
+  function loadImage(url) {
+    return new Promise((resolve, reject) => {
+      const im = new Image();
+      im.decoding = 'async';
+      let attempt = 0;
+      const ok = () => (im.decode ? im.decode().then(() => resolve('ok'), () => resolve('ok')) : resolve('ok'));
+      im.onload = ok;
+      im.onerror = () => {
+        if (attempt >= MAX_RETRY) { reject(new Error(url)); return; }
+        attempt += 1;
+        const busted = url + (url.includes('?') ? '&' : '?') + 'r=' + attempt;
+        setTimeout(() => { im.removeAttribute('src'); im.src = busted; }, DELAY[attempt - 1]);
+      };
+      im.src = url;
+    });
+  }
+
+  // 首页那 13 张图不由开屏去请求，只监听页面上真实存在的那几个 <img>。
+  // 理由不是省事，是优先级：自己 new Image() 会把 13 个低优先级请求提前到解析阶段，
+  // 和 assets.js / app.js / tiered.js 抢那 6 条连接——实测 1.5 Mbps 下把六个 defer
+  // 脚本挤到 8.2s 才回来，整页可交互被拖慢 7 秒；而浏览器的低优先级图片延迟策略
+  // 本来就会把图片排到首屏关键资源之后。等元素，反而更快，而且等的一定是用户看到的那张。
+  function waitImageEl(img) {
+    return new Promise(resolve => {
+      let settled = false;
+      const done = v => { if (settled) return; settled = true; resolve(v); };
+      const loaded = () => {
+        if (!img.complete || !img.naturalWidth) return;
+        (img.decode ? img.decode() : Promise.resolve()).then(() => done('ok'), () => done('ok'));
+      };
+      if (img.complete && img.naturalWidth) { loaded(); return; }
+      img.addEventListener('load', loaded);
+      img.addEventListener('error', () => {
+        // assets.js 会带着 cache-busting 重试（500/1500/3500ms）；它放弃之后我们也放弃。
+        setTimeout(() => done(img.naturalWidth ? 'ok' : 'failed'), BROKEN_GRACE);
+      }, { once: true });
+    });
+  }
+
+  // 字体用 document.fonts.load 而不是 fetch：fetch 在响应头到达时就 resolve，
+  // 不透明响应会让"字体已就绪"变成假象。load() 等的是真正可用。
+  function loadFont(spec, sample) {
+    if (!document.fonts) return Promise.resolve('ok');
+    let attempt = 0;
+    const loop = () => document.fonts.load(spec, sample).then(
+      faces => (faces && faces.length ? 'ok' : null),
+      () => null
+    ).then(res => {
+      if (res !== null) return res;
+      if (attempt >= MAX_RETRY) return 'skip';
+      attempt += 1;
+      return new Promise(r => setTimeout(r, DELAY[Math.min(attempt, DELAY.length) - 1])).then(loop);
+    });
+    return loop();
+  }
+
+  function leave() {
+    if (done || !splash) return;
+    done = true;
+    marks.enter_done = +performance.now().toFixed(1);
+    marks.enter_wait_ms = clicked ? +(marks.enter_done - marks.enter_click).toFixed(1) : null;
+    marks.waited_in_loading = !!waited;
+    try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (e) {}
+
+    // 立刻交还交互权：开屏只是"盖着"，不是"挡着"。
+    // 撤掉命中区域、解开 body 滚动、把焦点交回页面——首页在这一刻就是可用的，
+    // 不等退场动画。动画只是视觉上的收尾，不占任何等待时间。
+    splash.style.pointerEvents = 'none';
+    document.body.style.overflow = prevOverflow;
+    root.dataset.splashDone = '1';
+    const page = document.getElementById('page-content');
+    if (page) { try { page.focus({ preventScroll: true }); } catch (e) {} }
+
+    const finish = () => {
+      if (splash && splash.parentNode) splash.remove();
+      marks.splash_removed = +performance.now().toFixed(1);
+      try { delete window.__splashEnter; } catch (e) { window.__splashEnter = undefined; }
+    };
+    // 用户已经等过的（点 ENTER 时才显示 Loading 的那一类），就不要再补一段退场动画：
+    // 那等于为了动画再多等半秒。只有「点了就能走」的正常情况才播。
+    if (media.matches || waited) { finish(); return; }
+    splash.classList.remove('is-entering');
+    splash.classList.add('is-leaving');
+    splash.addEventListener('animationend', finish, { once: true });
+    setTimeout(finish, 700);           // 动画事件万一没触发也要收尾
+  }
+
+  // 这段脚本在 <head> 里，执行时 body 还不存在（存在也是空的），所以挂载要等 body 落地；
+  // 预载则立刻开始，不等 DOM。
+  function whenBody(fn) {
+    if (document.body) { fn(); return; }
+    if (!('MutationObserver' in window)) {
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+      return;
+    }
+    const mo = new MutationObserver(() => {
+      if (document.body) { mo.disconnect(); fn(); }
+    });
+    mo.observe(document.documentElement, { childList: true });
+  }
+
+  function mount() {
+    if (done) return;
+    splash = document.createElement('div');
+    splash.className = 'splash is-entering';
+    splash.setAttribute('role', 'dialog');
+    splash.setAttribute('aria-modal', 'true');
+    splash.setAttribute('aria-label', '进入 YangHang 的小小宇宙');
+    splash.innerHTML =
+      '<div class="splash-card">' +
+        '<p class="splash-kicker">Personal Archive · 私人档案</p>' +
+        '<picture><source srcset="assets/logo.avif" type="image/avif">' +
+          '<img class="splash-logo" src="assets/logo.webp" alt="YangHang" draggable="false"></picture>' +
+        '<div class="splash-rule" aria-hidden="true"></div>' +
+        '<h1 class="splash-title">欢迎来到我的小小宇宙</h1>' +
+        '<p class="splash-sub"><em>Welcome to my little universe</em>' +
+          '<span class="splash-sub-zh">作品、音乐、想法与旅行，都收在这一册里</span></p>' +
+        '<div class="splash-progress" aria-hidden="true">' +
+          '<div class="splash-track"><div class="splash-fill"></div></div>' +
+          '<p class="splash-status" aria-live="polite">BINDING THE ARCHIVE 0%</p>' +
+        '</div>' +
+        '<button class="splash-enter" type="button"><span class="en">Enter my world</span><span class="zh">进入</span></button>' +
+      '</div>';
+    document.body.appendChild(splash);
+
+    fill = splash.querySelector('.splash-fill');
+    status = splash.querySelector('.splash-status');
+    btn = splash.querySelector('.splash-enter');
+    label = btn.querySelector('.en');
+    sub = btn.querySelector('.zh');
+    marks.splash_mounted = +performance.now().toFixed(1);
+
+    prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    btn.addEventListener('click', () => {
+      if (done || clicked) return;
+      clicked = true;
+      marks.enter_click = +performance.now().toFixed(1);
+      if (ready) { leave(); return; }             // 就绪：立刻走，不等动画
+      // 还没就绪：按钮原地换成 Loading...，位置和尺寸都不动，继续加载，
+      // 就绪后 render() 会自己调 leave()，不需要第二下点击。
+      waited = true;
+      btn.classList.add('is-loading');
+      btn.setAttribute('aria-busy', 'true');
+      label.textContent = 'Loading...';
+      sub.textContent = '装订中';
+    });
+
+    // 开屏里只有这一个可聚焦元素，Tab 不该跑到被盖住的导航上去。
+    splash.addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      e.preventDefault();
+      if (btn) btn.focus({ preventScroll: true });
+    });
+
+    btn.focus({ preventScroll: true });
+    render();
+  }
+
+  if (document.body) mount(); else whenBody(mount);
+
+  // ---- 预载 ----
+  // 不判断浏览器支不支持 AVIF：图片是由 <picture> 在页面上自己选的格式，
+  // 这里只认最终落到 <img> 里的那张，连格式都不用知道。
+  function startLoading() {
+    // 首页的 <img>：DOM 解析完才存在，所以登记任务放在这里。
+    const imgs = [...document.querySelectorAll('#home img')];
+    imagesQueued = true;
+    imgs.forEach((img, i) => {
+      const id = 'img:' + i;
+      state.set(id, 'pending');
+      withDeadline(id, () => waitImageEl(img));
+    });
+    withDeadline('paper', () => loadImage('assets/paper.webp'));
+    // 样式表也算 P0：开屏自己带内联样式，但底下的首页要靠 style.css。
+    // 少了这一项，页脚会在样式表还没解析完时就被揭开，那就是一版裸 HTML。
+    withDeadline('css', () => new Promise(resolve => {
+      const release = () => resolve('ok');
+      const link = document.querySelector('link[rel="stylesheet"]');
+      if (!link || link.sheet) { resolve('ok'); return; }   // 已经解析完了
+      link.addEventListener('load', release, { once: true });
+      link.addEventListener('error', release, { once: true }); // 样式挂了也别把门锁死
+    }));
+    P0_FONTS.forEach((f, i) => {
+      withDeadline('font:' + i, () => loadFont(f.spec, f.sample));
+    });
+    render();
+  }
+
+  // 等 DOM 落地再登记图片任务：那一刻才知道首页是哪 13 张。
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startLoading, { once: true });
+    document.addEventListener('DOMContentLoaded', () => settle('dom', 'ok'), { once: true });
+  } else {
+    startLoading();
+    settle('dom', 'ok');
+  }
+
+  // 给回归/测量脚本用：不必等网络也能收掉开屏
+  window.__splashEnter = () => { if (btn && !clicked) btn.click(); };
+  window.__splashMarks = marks;
+})();
+  </script>
   <script src="assets.js" defer></script>
   <script src="app.js" defer></script>
   <script src="music.js" defer></script>
