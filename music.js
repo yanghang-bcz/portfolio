@@ -24,7 +24,7 @@
   {
     "id": "favorite-3",
     "color": "#827b6d",
-    "cover": "assets/music/03_Kendrick_Lamar_To_Pimp_a_Butterfly.jpg",
+    "cover": "assets/music/03_Kendrick_Lamar_To_Pimp_a_Butterfly.webp",
     "title": "To Pimp a Butterfly",
     "artist": "Kendrick Lamar",
     "tilt": -1.2,
@@ -51,7 +51,7 @@
   {
     "id": "favorite-6",
     "color": "#827b6d",
-    "cover": "assets/music/06_Frank_Ocean_channel_ORANGE.jpg",
+    "cover": "assets/music/06_Frank_Ocean_channel_ORANGE.webp",
     "title": "channel ORANGE",
     "artist": "Frank Ocean",
     "tilt": 2.6,
@@ -163,7 +163,13 @@
       cover.style.setProperty('--cover-color', album.color);
       if (album.cover) {
         const image = document.createElement('img');
-        image.src = album.cover;
+        // 分级加载：Music 的 16 张封面要等这个栏目真的被打开才取（见 tiered.js）
+        image.dataset.src = album.cover;
+        image.dataset.tier = 'music';
+        // AVIF 优先；album.cover 那一份是回退（旧 JPEG，或 WebP 更小时换成的 WebP）
+        if (/^assets\/music\/.+\.jpg$/.test(album.cover)) {
+          image.dataset.avif = album.cover.replace(/\.jpg$/, '.avif');
+        }
         image.alt = album.title ? `${album.title} — ${album.artist}` : '专辑封面';
         image.loading = showCaption ? 'eager' : 'lazy';
         image.decoding = 'async';

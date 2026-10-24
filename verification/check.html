@@ -8,13 +8,90 @@
  // 固定 sleep 会偶发抢跑（同样的代码三次里偶尔挂一条）。等条件成立，最多等 ms。
  const until=async(fn,ms=2500)=>{const t=Date.now();while(Date.now()-t<ms){if(fn())return true;await wait(50);}return false;};
  function check(name,ok,detail){results.push({name,pass:!!ok,...(detail?{detail}: {})});output.textContent=JSON.stringify(results,null,2);}
- async function load(width,height){frame.style.width=width+'px';frame.style.height=height+'px';await new Promise(resolve=>{frame.onload=resolve;frame.src='../index.html?qa='+Date.now()});await frame.contentDocument.fonts.ready;await wait(300);}
+ async function load(width,height){
+   frame.style.width=width+'px';frame.style.height=height+'px';
+   await new Promise(resolve=>{frame.onload=resolve;frame.src='../index.html?qa='+Date.now()});
+   // 开屏只在会话首屏出现；万一还在（新会话），先把它正常收掉，否则 elementFromPoint 会命中它。
+   const d0=frame.contentDocument,w0=frame.contentWindow;
+   if(d0.querySelector('.splash')&&w0.__splashEnter){w0.__splashEnter();await until(()=>!d0.querySelector('.splash'),15000);}
+   await frame.contentDocument.fonts.ready;await wait(300);
+ }
  const positions=d=>[...d.querySelectorAll('.satellite')].map(e=>e.style.cssText);
  const rect=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}};
+ // —— 开屏：ENTER 出现即可点 ——
+ // 用户的要求是「从出现开始就允许点击，不能等资源下载完才解锁」。
+ // 所以这里不等 load 事件，一发现按钮就点下去：那一刻 13 张图一张都还没回来。
+ // 分节号 1/2/3 只在这个块里用。
+ {
+   frame.style.width='1440px';frame.style.height='900px';
+   const nav=new Promise(resolve=>{frame.onload=resolve;frame.src='../index.html?qa='+Date.now()});
+   let hit=null;
+   {
+     const t=Date.now();
+     while(Date.now()-t<15000){
+       let b=null;
+       try{b=frame.contentDocument&&frame.contentDocument.querySelector('.splash-enter');}catch(e){}
+       if(b){
+         const before=b.textContent.trim(),disabled=b.disabled;
+         b.click();                                   // 挂载瞬间点
+         hit={before,disabled,after:b.textContent.trim(),loading:b.classList.contains('is-loading'),busy:b.getAttribute('aria-busy')};
+         break;
+       }
+       await wait(4);
+     }
+   }
+   check('Splash: ENTER is clickable the instant it appears',!!hit&&hit.disabled===false,hit);
+   check('Splash: clicking before assets are ready turns it into Loading, in place',
+     !!hit&&hit.loading===true&&hit.busy==='true'&&hit.after.includes('Loading')&&hit.before!==hit.after,hit);
+   await nav;
+   const sd=frame.contentDocument,sw=frame.contentWindow;
+   const selfGone=await until(()=>!sd.querySelector('.splash'),25000);
+   const m=sw.__splashMarks||{};
+   check('Splash: it lets you in by itself, no second click',selfGone&&m.waited_in_loading===true,{selfGone,marks:m});
+   check('Splash: the wait is the remaining assets, not an animation',
+     typeof m.enter_wait_ms==='number'&&m.enter_wait_ms>=0&&m.enter_wait_ms<25000&&m.splash_removed-m.enter_done<100,m);
+   check('Splash: hands the page back — scroll unlocked, focus on the content',
+     sd.body.style.overflow===''&&sd.activeElement&&sd.activeElement.id==='page-content'&&sd.documentElement.dataset.splashDone==='1',
+     {overflow:sd.body.style.overflow,focus:sd.activeElement&&sd.activeElement.id,done:sd.documentElement.dataset.splashDone});
+   check('Splash: the home page behind it is fully painted, no half-loaded reveal',
+     [...sd.querySelectorAll('#home img')].every(i=>i.complete&&i.naturalWidth>0),{n:sd.querySelectorAll('#home img').length});
+   // 就绪不等于成功：真有图没到位时，状态行必须写 "N MISSING" 而不是 READY。
+   check('Splash: it reports missing plates instead of claiming everything ready',
+     typeof m.missing==='number'&&m.missing===0&&Array.isArray(m.missing_ids)&&m.missing_ids.length===0,
+     {missing:m.missing,ids:m.missing_ids});
+
+   // 同一会话第二次不再拦：刷新不该每次都要按一次 ENTER。
+   await new Promise(resolve=>{frame.onload=resolve;frame.src='../index.html?qa='+Date.now()});
+   check('Splash: a second visit in the same session skips it',!frame.contentDocument.querySelector('.splash'));
+
+   // 手机：清掉会话标记再看一次版面和触控尺寸。
+   frame.contentWindow.sessionStorage.removeItem('portfolio-splash-seen');
+   frame.style.width='390px';frame.style.height='844px';
+   await new Promise(resolve=>{frame.onload=resolve;frame.src='../index.html?qa='+Date.now()});
+   const md=frame.contentDocument,mw=frame.contentWindow;
+   const mBtn=await until(()=>md.querySelector('.splash-enter'),15000)?md.querySelector('.splash-enter'):null;
+   const bR=mBtn?rect(mBtn):{w:0,h:0},cR=md.querySelector('.splash-card')?rect(md.querySelector('.splash-card')):{x:0,y:0,w:0,h:0};
+   check('390px: ENTER is a 44px+ target inside the viewport, nothing overflows',
+     !!mBtn&&bR.w>=43.9&&bR.h>=43.9&&cR.x>=0&&cR.x+cR.w<=390&&md.documentElement.scrollWidth===390,
+     {btn:bR,card:cR,sw:md.documentElement.scrollWidth});
+   mw.__splashEnter&&mw.__splashEnter();
+   check('390px: tapping ENTER gets you in',await until(()=>!md.querySelector('.splash'),15000));
+ }
  await load(1920,1080);
  let d=frame.contentDocument,w=frame.contentWindow;
- const eagerImgs=[...d.images].filter(i=>i.loading!=='lazy');
+ // 分级加载后，非当前栏目的 <img> 在进入前只有 data-src、没有 src——那不是"坏图"。
+ // 所以这里只看真的发起了加载的那些（有 src 的）。
+ const eagerImgs=[...d.images].filter(i=>i.loading!=='lazy'&&i.getAttribute('src'));
  check('Every eagerly loaded image asset resolved',eagerImgs.length>=13&&eagerImgs.every(i=>i.complete&&i.naturalWidth>0),{count:eagerImgs.length,broken:eagerImgs.filter(i=>!i.complete||!i.naturalWidth).map(i=>i.getAttribute('src'))});
+// 阶段二：AVIF 优先。Chrome 支持 AVIF，所以首页每一张都必须真的走到 .avif，
+// 走不到就说明 <source> 写错或文件 404（那种情况会静默退回 fallback，看着没事但其实白多存一份）。
+ const homeSrc=[...d.querySelectorAll('#home img')].map(i=>i.currentSrc||i.src);
+ check('Home renders from AVIF, not the fallback',homeSrc.length>=13&&homeSrc.every(s=>/\.avif(\?|$)/.test(s)),{srcs:homeSrc.map(s=>s.split('/').pop())});
+// 首访只该拿首页的东西。Music / Travel 一个字节都不该发出去。
+ const resNames=()=>w.performance.getEntriesByType('resource').map(e=>e.name);
+ check('Tiered loading: first Home paint requests no Music or Travel asset',
+   !resNames().some(n=>/assets\/(music|travel)\//.test(n)),
+   {music:resNames().filter(n=>/assets\/music\//.test(n)).length,travel:resNames().filter(n=>/assets\/travel\//.test(n)).length});
  check('Special Elite loaded',d.fonts.check('16px "Special Elite"'));
  let first=positions(d);await wait(220);check('All five satellites translate along orbit',positions(d).every((p,i)=>p!==first[i]));
  const radio=d.querySelector('[data-satellite="music"]');
@@ -116,6 +193,12 @@ const hts=floaters.map(i=>i.offsetHeight),noteH=hts.slice(0,3);
 check('The gramophone outscales the three notes, which stay uniform',
   hts[3]>Math.max(...noteH)+8&&Math.max(...noteH)-Math.min(...noteH)<=2&&hts[3]/Math.max(...noteH)>1.25,
   {heights:hts,ratio:+(hts[3]/Math.max(...noteH)).toFixed(2)});
+// 分级加载的反面：进到 Music 就必须全部到位，而且每张封面只请求一次（不能重复下载）。
+const musicCovers=[...d.querySelectorAll('#music img[data-tier="music"]')];
+const musicReqs=resNames().filter(n=>/assets\/music\//.test(n));
+check('Tiered loading: all 16 covers arrive on first Music entry, one request each',
+  musicCovers.length===16&&musicCovers.every(i=>i.complete&&i.naturalWidth>0)&&musicReqs.length===16,
+  {covers:musicCovers.length,loaded:musicCovers.filter(i=>i.complete&&i.naturalWidth>0).length,requests:musicReqs.length});
 const tA=floaters.map(i=>w.getComputedStyle(i).transform);await wait(450);
 const tB=floaters.map(i=>w.getComputedStyle(i).transform);
 check('They drift like the astronaut, each on its own phase',tA.every((v,i)=>v!==tB[i])&&new Set(floaters.map(i=>w.getComputedStyle(i).animationDuration)).size>1,
@@ -147,7 +230,7 @@ const printBase=d.querySelector('#about .photo-print--base'),printTop=d.querySel
 const tilt=el=>{const m=new w.DOMMatrixReadOnly(w.getComputedStyle(el).transform);return Math.round(Math.atan2(m.b,m.a)*1800/Math.PI)/10;};
 const pb=rect(printBase),pt=rect(printTop),intro=rect(d.querySelector('.about-entry > p:not(.category)')),aboutFolio=rect(d.querySelector('#about .folio'));
 const ovl={w:Math.round(Math.min(pb.x+pb.w,pt.x+pt.w)-Math.max(pb.x,pt.x)),h:Math.round(Math.min(pb.y+pb.h,pt.y+pt.h)-Math.max(pb.y,pt.y))};
-check('About holds both photos as real loaded assets',[printBase,printTop].every(f=>{const i=f.querySelector('img');return i.complete&&i.naturalWidth>0&&/photo-(bamboo|selfie)\.jpg$/.test(i.getAttribute('src'));}),[printBase,printTop].map(f=>f.querySelector('img').getAttribute('src')));
+check('About holds both photos as real loaded assets',[printBase,printTop].every(f=>{const i=f.querySelector('img');return i.complete&&i.naturalWidth>0&&/photo-(bamboo|selfie)\.(jpe?g|webp|avif)$/.test(i.currentSrc||i.getAttribute('src')||'');}),[printBase,printTop].map(f=>f.querySelector('img').getAttribute('src')));
 check('The selfie sits on top and bites into the bamboo shot’s top-left',Number(w.getComputedStyle(printTop).zIndex)>Number(w.getComputedStyle(printBase).zIndex)&&ovl.w>100&&ovl.h>120,{overlap:ovl,z:[w.getComputedStyle(printBase).zIndex,w.getComputedStyle(printTop).zIndex]});
 check('The two prints lean opposite ways, not onto a grid',tilt(printBase)<-1&&tilt(printTop)>1,{base:tilt(printBase),top:tilt(printTop)});
 check('On desktop the pair sits in the right margin, clear of the text',
@@ -280,6 +363,26 @@ check('A failed image is retried with a cache-busting query',await until(()=>/re
 check('Retries climb to three and then stop',await until(()=>/retry=3/.test(ghost.getAttribute('src')||''),14000),{src:ghost.getAttribute('src')});
 await wait(4200);
 check('A permanently missing file stops retrying instead of looping',/retry=3/.test(ghost.getAttribute('src')||'')&&ghost.complete&&ghost.naturalWidth===0,{src:ghost.getAttribute('src')});
+// 断网十几秒再恢复时，那三次额度早就烧完了——回到 online 必须重新给一次机会，
+// 否则用户得手动刷新。这里直接派发 online 事件，看额度有没有被重置。
+w.dispatchEvent(new w.Event('online'));
+check('Reconnecting gives broken images a fresh set of retries',await until(()=>/retry=1/.test(ghost.getAttribute('src')||''),5000),{src:ghost.getAttribute('src')});
+// —— AVIF 文件没了（不是"浏览器不支持"）必须退到 WebP ——
+// <picture> 的降级只认"不支持 image/avif"，source 一旦匹配就永远优先于 img.src，
+// 所以把 retry 参数加在 src 上重试三次也没用，图会一直是破的。这里用一张真 404 的
+// avif + 一张真存在的 webp 复现，必须靠 assets.js 拆掉 source 换 src 才能救回来。
+const avifProbe=d.createElement('picture');
+avifProbe.style.cssText='position:absolute;left:-9999px;top:0;width:8px;height:8px;opacity:0';
+avifProbe.innerHTML='<source srcset="../assets/__qa-missing__.avif" type="image/avif"><img src="../assets/plane.webp" alt="">';
+d.body.appendChild(avifProbe);
+const avifImg=avifProbe.querySelector('img');
+check('A missing AVIF file falls back to its WebP instead of staying broken',
+  await until(()=>avifImg.complete&&avifImg.naturalWidth>0,12000),
+  {src:(avifImg.currentSrc||'').split('/').pop(),sources:avifProbe.querySelectorAll('source').length});
+const avifBacked=[...d.querySelectorAll('.page img')].filter(i=>/\.avif(\?|$)/.test(i.currentSrc||''));
+check('Every AVIF-backed image carries a WebP address to fall back to',
+  avifBacked.length>=13&&avifBacked.every(i=>{const fb=i.dataset.fallback||i.getAttribute('src')||'';return fb&&!/\.avif/i.test(fb);}),
+  {n:avifBacked.length,sample:avifBacked.slice(0,3).map(i=>[i.dataset.fallback,i.getAttribute('src')])});
 check('Every declared font face has finished loading',[...d.fonts].every(f=>f.status==='loaded'),[...d.fonts].map(f=>`${f.family.replace(/"/g,'')}:${f.status}`));
 document.body.dataset.done='true';document.body.dataset.passed=results.every(r=>r.pass)?'true':'false';
  output.textContent=JSON.stringify({passed:results.filter(r=>r.pass).length,total:results.length,results},null,2);
