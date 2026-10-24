@@ -30,6 +30,31 @@
 
   const attempts = new WeakMap();
 
+  const isAVIF = url => /\.avif(\?|$)/i.test(url || '');
+
+  /* AVIF 退到 WebP。
+   *
+   * <picture> 的降级只认"浏览器不支持 image/avif"，不认"这个文件 404"——
+   * source 一旦匹配就永远优先于 img 的 src，把 retry 参数加在 src 上重试多少次
+   * 都没用，图还是破的（实测：掐断 *.avif 后首页 15 张全坏，一张都没退）。
+   * 所以这里显式退一级：去掉 <source>、把同名的 webp 写成 src。
+   *
+   * 回退地址从两个地方取：内页由 tiered.js 预留的 data-fallback，首页直接就是
+   * img 自己的 src（<picture> 里的 src 本来就是 webp）。 */
+  const fallBackFromAVIF = img => {
+    const fb = img.dataset.fallback || img.getAttribute('src') || '';
+    if (!fb || isAVIF(fb)) return false;
+    const pic = img.parentElement && img.parentElement.tagName === 'PICTURE' ? img.parentElement : null;
+    if (pic) for (const s of pic.querySelectorAll('source')) s.remove();
+    img.dataset.fellBack = '1';
+    // 换了一个地址，重试计数要重新开始，否则 webp 只剩上一次用剩的额度。
+    attempts.delete(img);
+    delete img.dataset.srcOriginal;
+    img.removeAttribute('src');
+    img.src = fb;
+    return true;
+  };
+
   const retryImage = img => {
     const tried = attempts.get(img) || 0;
     if (tried >= MAX_RETRY) return;
@@ -50,12 +75,19 @@
     }, DELAY[tried]);
   };
 
+  const handleImageError = img => {
+    // 当前真正在渲染的是 avif 且还没退过 → 先退格式，比对着 404 重试三次快得多。
+    const current = img.currentSrc || img.getAttribute('src') || '';
+    if (!img.dataset.fellBack && isAVIF(current) && fallBackFromAVIF(img)) return;
+    retryImage(img);
+  };
+
   // 一、之后的失败：error 不冒泡，但捕获阶段能在 document 上收到。
   //     music.js 动态创建的封面同样是 <img>，一并覆盖。
   document.addEventListener(
     'error',
     event => {
-      if (event.target instanceof HTMLImageElement) retryImage(event.target);
+      if (event.target instanceof HTMLImageElement) handleImageError(event.target);
     },
     true
   );
@@ -65,7 +97,7 @@
   //     但 complete 为 false，不会被误判。
   const sweepBroken = () => {
     for (const img of document.images) {
-      if (img.complete && img.naturalWidth === 0) retryImage(img);
+      if (img.complete && img.naturalWidth === 0) handleImageError(img);
     }
   };
 
@@ -75,7 +107,20 @@
     setTimeout(sweepBroken, 300);
   }
 
-  /* 三、.paper 是 CSS 背景图，拿不到时只剩一层底色（看着就是"空白"），
+  /* 三、断网恢复。
+   *     离线时那三次重试会在五秒多内烧完，之后图就永久停在破图上——实测断网 12 秒，
+   *     恢复后 14/14 还是坏的，只能手动刷新。回到 online 时把计数清零再扫一遍，
+   *     用户不需要知道刚才断过网。 */
+  addEventListener('online', () => {
+    for (const img of document.images) {
+      attempts.delete(img);
+      delete img.dataset.srcOriginal;      // 下次重试从当前 src 重新派生
+    }
+    setTimeout(sweepBroken, 400);
+    setTimeout(retryBackground, 600);
+  });
+
+  /* 四、.paper 是 CSS 背景图，拿不到时只剩一层底色（看着就是"空白"），
    *     而且背景图失败后浏览器同样不会重试。用一张探针图走同一套重试，
    *     成功后再把带参数的 URL 写回元素——此时已在缓存里，不会二次下载。
    *     探针一直失败就保持原样，底色本身是设计里的一部分。 */
@@ -101,7 +146,7 @@
   };
   setTimeout(retryBackground, 1200);
 
-  /* 四、字体。--script（Huiwen Mincho）是 2.2MB 的那一个，断掉就会一直停在
+  /* 五、字体。--script（Huiwen Mincho）是 2.2MB 的那一个，断掉就会一直停在
    *     兜底衬线体上，看起来就是"字体不对"。失败后重新声明同一族名 + 新 URL，
    *     后声明的 @font-face 覆盖前者，字形来自同一份文件，渲染结果不变。 */
   const FACES = [

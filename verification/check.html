@@ -55,6 +55,10 @@
      {overflow:sd.body.style.overflow,focus:sd.activeElement&&sd.activeElement.id,done:sd.documentElement.dataset.splashDone});
    check('Splash: the home page behind it is fully painted, no half-loaded reveal',
      [...sd.querySelectorAll('#home img')].every(i=>i.complete&&i.naturalWidth>0),{n:sd.querySelectorAll('#home img').length});
+   // 就绪不等于成功：真有图没到位时，状态行必须写 "N MISSING" 而不是 READY。
+   check('Splash: it reports missing plates instead of claiming everything ready',
+     typeof m.missing==='number'&&m.missing===0&&Array.isArray(m.missing_ids)&&m.missing_ids.length===0,
+     {missing:m.missing,ids:m.missing_ids});
 
    // 同一会话第二次不再拦：刷新不该每次都要按一次 ENTER。
    await new Promise(resolve=>{frame.onload=resolve;frame.src='../index.html?qa='+Date.now()});
@@ -359,6 +363,26 @@ check('A failed image is retried with a cache-busting query',await until(()=>/re
 check('Retries climb to three and then stop',await until(()=>/retry=3/.test(ghost.getAttribute('src')||''),14000),{src:ghost.getAttribute('src')});
 await wait(4200);
 check('A permanently missing file stops retrying instead of looping',/retry=3/.test(ghost.getAttribute('src')||'')&&ghost.complete&&ghost.naturalWidth===0,{src:ghost.getAttribute('src')});
+// 断网十几秒再恢复时，那三次额度早就烧完了——回到 online 必须重新给一次机会，
+// 否则用户得手动刷新。这里直接派发 online 事件，看额度有没有被重置。
+w.dispatchEvent(new w.Event('online'));
+check('Reconnecting gives broken images a fresh set of retries',await until(()=>/retry=1/.test(ghost.getAttribute('src')||''),5000),{src:ghost.getAttribute('src')});
+// —— AVIF 文件没了（不是"浏览器不支持"）必须退到 WebP ——
+// <picture> 的降级只认"不支持 image/avif"，source 一旦匹配就永远优先于 img.src，
+// 所以把 retry 参数加在 src 上重试三次也没用，图会一直是破的。这里用一张真 404 的
+// avif + 一张真存在的 webp 复现，必须靠 assets.js 拆掉 source 换 src 才能救回来。
+const avifProbe=d.createElement('picture');
+avifProbe.style.cssText='position:absolute;left:-9999px;top:0;width:8px;height:8px;opacity:0';
+avifProbe.innerHTML='<source srcset="../assets/__qa-missing__.avif" type="image/avif"><img src="../assets/plane.webp" alt="">';
+d.body.appendChild(avifProbe);
+const avifImg=avifProbe.querySelector('img');
+check('A missing AVIF file falls back to its WebP instead of staying broken',
+  await until(()=>avifImg.complete&&avifImg.naturalWidth>0,12000),
+  {src:(avifImg.currentSrc||'').split('/').pop(),sources:avifProbe.querySelectorAll('source').length});
+const avifBacked=[...d.querySelectorAll('.page img')].filter(i=>/\.avif(\?|$)/.test(i.currentSrc||''));
+check('Every AVIF-backed image carries a WebP address to fall back to',
+  avifBacked.length>=13&&avifBacked.every(i=>{const fb=i.dataset.fallback||i.getAttribute('src')||'';return fb&&!/\.avif/i.test(fb);}),
+  {n:avifBacked.length,sample:avifBacked.slice(0,3).map(i=>[i.dataset.fallback,i.getAttribute('src')])});
 check('Every declared font face has finished loading',[...d.fonts].every(f=>f.status==='loaded'),[...d.fonts].map(f=>`${f.family.replace(/"/g,'')}:${f.status}`));
 document.body.dataset.done='true';document.body.dataset.passed=results.every(r=>r.pass)?'true':'false';
  output.textContent=JSON.stringify({passed:results.filter(r=>r.pass).length,total:results.length,results},null,2);

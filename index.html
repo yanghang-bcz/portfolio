@@ -253,6 +253,7 @@
   const BROKEN_GRACE = 6500;         // 已报错的图：等 assets.js 走完 500/1500/3500 三次重试再放弃
 
   const state = new Map();
+  const missing = [];                // 就绪时仍为 failed 的任务 id
   let ready = false, clicked = false, waited = false, done = false;
   let imagesQueued = false;          // 首页图片的任务要等 DOM 出来才登记得出来
   let splash = null, btn = null, label = null, sub = null, fill = null, status = null;
@@ -272,18 +273,36 @@
     render();
   }
 
+  // 就绪里有多少是"没拿到"的。AVIF 失败会由 assets.js 退到 WebP，所以正常情况下
+  // 这里应该是 0；它非 0 就意味着真的有图没到位，状态行不能只写 READY。
+  function failedIds() {
+    const out = [];
+    for (const [id, v] of state) if (v === 'failed') out.push(id);
+    return out;
+  }
+
   function render() {
     const total = state.size;
     let settled = 0;
     for (const v of state.values()) if (v !== 'pending') settled += 1;
     const pct = total ? Math.round(settled / total * 100) : 0;
     if (fill) fill.style.width = pct + '%';
-    if (status && !done) status.textContent = ready ? 'READY' : 'BINDING THE ARCHIVE ' + pct + '%';
+    if (status && !done) {
+      if (!ready) status.textContent = 'BINDING THE ARCHIVE ' + pct + '%';
+      else if (missing.length) status.textContent = 'READY · ' + missing.length + ' MISSING';
+      else status.textContent = 'READY';
+    }
     // imagesQueued 这个闸门不能省：DOMContentLoaded 一到，dom/css/paper 可能已经齐了，
     // 此时图片任务还没登记，settled>=total 会被当成"全好了"而提前放人进去。
     if (total && settled >= total && !ready && imagesQueued) {
       ready = true;
       marks.ready_at = +performance.now().toFixed(1);
+      const failed = failedIds();
+      missing.length = 0;
+      missing.push(...failed);
+      marks.missing = failed.length;
+      marks.missing_ids = failed;
+      render();                                    // 补一次，把状态行写成 READY / N MISSING
       if (clicked) leave();                        // 已经点过，就地进入
     }
   }
@@ -293,7 +312,9 @@
       factory(),
       new Promise(resolve => setTimeout(() => resolve('__timeout__'), TASK_TIMEOUT))
     ]).then(
-      v => settle(id, v === '__timeout__' ? 'failed' : 'ok'),
+      // 只有真拿到才算 ok。'failed' 是任务自己给出的结论（图重试用尽、字体放弃），
+      // 不能因为"不是超时"就当成成功——那会让开屏在缺图时写 READY。
+      v => settle(id, v === '__timeout__' || v === 'failed' ? 'failed' : 'ok'),
       () => settle(id, 'failed')          // 重试用尽：算这个任务结束，不放任 unhandledrejection
     );
   }

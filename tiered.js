@@ -94,6 +94,7 @@
         // img.src 也指向同一地址：assets.js 的失败重试要能从 src 上取到原始地址；
       }
       if (img && img.dataset.src) {
+        img.dataset.fallback = img.dataset.src;      // avif 404 时退到这一份
         img.loading = 'eager';
         img.src = url;
         img.removeAttribute('data-src');
@@ -102,6 +103,7 @@
       return;
     }
     if (img && img.dataset.src) {
+      if (useAVIF) img.dataset.fallback = img.dataset.src;
       img.loading = 'eager';
       img.src = url;
       img.removeAttribute('data-src');
@@ -149,11 +151,24 @@
       settled = true;
       apply(unit, finalURL, useAVIF);
     } catch {
-      // 预载彻底失败：仍然把地址写回，交给 assets.js 的那套重试继续争取，
-      // 否则这一格会一直是空的（assets.js 只对"有 src 的失败图"生效）。
       clearTimeout(fallback);
       if (settled) return;
+      // avif 彻底失败（文件没了 / 被拦），先在同一次预载里退到 webp，
+      // 别把破图写进 DOM 再等 assets.js 去救——那要多绕一个来回。
+      const fb = unit.img && unit.img.dataset.src;
+      if (useAVIF && fb) {
+        try {
+          const finalFallback = await preload(fb);
+          if (settled) return;
+          settled = true;
+          apply(unit, finalFallback, false);
+          return;
+        } catch { /* webp 也不行，落到下面交给 assets.js */ }
+      }
+      if (settled) return;
       settled = true;
+      // 预载彻底失败：仍然把地址写回，交给 assets.js 的那套重试继续争取，
+      // 否则这一格会一直是空的（assets.js 只对"有 src 的失败图"生效）。
       apply(unit, url, useAVIF);
     }
   }
