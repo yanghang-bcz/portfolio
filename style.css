@@ -5,10 +5,13 @@
 @font-face{font-family:"Oswald";src:url("assets/Oswald-Medium-latin.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
 @font-face{font-family:"Space Mono";src:url("assets/SpaceMono-Bold-latin.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
 @font-face{font-family:"Special Elite";src:url("assets/SpecialElite-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
-/* Chinese face: Huiwen-mincho (CC0 1.0) — period letterpress. Subset to 3500 common
-   characters; 。，、 outlines moved to the lower-left corner, the Chinese convention.
-   See assets/HuiwenMincho-LICENSE.txt. */
-@font-face{font-family:"Huiwen Mincho";src:url("assets/HuiwenMincho-Regular-subset.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap;unicode-range:U+0000-00FF,U+2000-206F,U+3000-303F,U+4E00-9FFF,U+FF00-FFEF}
+/* Chinese face: Huiwen-mincho (CC0 1.0) — period letterpress. Subset to the 798
+   codepoints the site actually renders; 。，、 outlines moved to the lower-left corner,
+   the Chinese convention. Characters outside the subset fall back to the system serif
+   exactly as they did before (Japanese kana, a few rare hanzi, emoji).
+   Rebuild: pyftsubset assets/HuiwenMincho-Regular.min.woff2 --text-file=<chars.txt>
+   --flavor=woff2 --layout-features=* . See assets/HuiwenMincho-LICENSE.txt. */
+@font-face{font-family:"Huiwen Mincho";src:url("assets/HuiwenMincho-Regular.min.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap;unicode-range:U+0000-00FF,U+2000-206F,U+3000-303F,U+4E00-9FFF,U+FF00-FFEF}
 :root{--ink:#322d26;--paper:#eee5d2;--scale:1;--slide-duration:600ms;--script:"Huiwen Mincho";font-family:"Special Elite",var(--script),serif;color:var(--ink);background:var(--paper)}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{isolation:isolate}button,a{-webkit-tap-highlight-color:transparent}a{color:inherit}button{font:inherit;color:inherit}button,a{touch-action:manipulation}button{cursor:pointer}button:focus-visible,a:focus-visible{outline:2px dashed #554c3e;outline-offset:6px}h1:focus{outline:none}.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .paper{position:fixed;inset:0;z-index:-1;background:var(--paper) url("assets/paper.webp") center/cover no-repeat;pointer-events:none}

@@ -112,7 +112,7 @@
     { family: 'Special Elite', file: 'assets/SpecialElite-Regular.ttf', format: 'truetype', weight: '400', style: 'normal' },
     {
       family: 'Huiwen Mincho',
-      file: 'assets/HuiwenMincho-Regular-subset.woff2',
+      file: 'assets/HuiwenMincho-Regular.min.woff2',
       format: 'woff2',
       weight: '400',
       style: 'normal',
