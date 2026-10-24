@@ -13,6 +13,7 @@
   <script src="app.js" defer></script>
   <script src="music.js" defer></script>
   <script src="reader.js" defer></script>
+  <script src="tiered.js" defer></script>
 </head>
 <body>
   <div class="paper" aria-hidden="true"></div>
@@ -116,10 +117,10 @@
             <ul class="album-grid favorites-grid" id="favorite-albums" aria-label="Favo 12 专辑封面占位，编号不代表排名"></ul>
           </section>
           <div class="music-floaters" aria-hidden="true">
-            <img src="assets/music-note-a.webp" alt="" width="165" height="260" loading="lazy" decoding="async">
-            <img src="assets/music-note-b.webp" alt="" width="180" height="260" loading="lazy" decoding="async">
-            <img src="assets/music-note-pair.webp" alt="" width="243" height="260" loading="lazy" decoding="async">
-            <img src="assets/music-gramophone.webp" alt="" width="218" height="260" loading="lazy" decoding="async">
+            <img data-src="assets/music-note-a.webp" alt="" width="165" height="260" loading="lazy" decoding="async">
+            <img data-src="assets/music-note-b.webp" alt="" width="180" height="260" loading="lazy" decoding="async">
+            <img data-src="assets/music-note-pair.webp" alt="" width="243" height="260" loading="lazy" decoding="async">
+            <img data-src="assets/music-gramophone.webp" alt="" width="218" height="260" loading="lazy" decoding="async">
           </div>
           <section class="music-collection music-repeat" aria-labelledby="repeat-title">
             <header class="collection-heading"><h2 id="repeat-title">Lately, on repeat.</h2><p>What I've been listening to lately.</p></header>
@@ -135,7 +136,7 @@
       <div class="folio">
         <a href="#home" data-route="home" class="back-link">← BACK HOME <span>返回首页</span></a>
         <header class="folio-heading"><p class="archive-number">01 / PERSONAL ARCHIVE</p><h1 id="about-title" tabindex="-1">About Me</h1><p>杨航 / YangHang</p></header>
-        <div class="empty-entry about-entry"><p class="category">A NOTE FROM SHANGHAI</p><h2>你好，我是杨航。</h2><p>欢迎你来了解关于我。平时特别喜欢听音乐和研究音乐，如果你想了解我的音乐偏好和理解，可以点进 <a href="#music" data-route="music" class="inline-link">Music 专栏</a>。</p><p>同时也很喜欢看书，正不断拓宽自己的阅读面；喜欢讨论社会学问题，会思考关于性别与身体、人际间关系、权力与制度、技术与人等话题。</p><p>我也会在平时做一做自己的小工具和小网站，通过作品与世界和人建立更深的联系，去影响他人和社会。</p><div class="field-tags"><p class="tag-item"><img class="tag-label" src="assets/label-mbti.webp" alt="MBTI" width="320" height="146" loading="lazy" decoding="async"><span class="tag-value">ENFJ 主人公</span></p><p class="tag-item"><img class="tag-label" src="assets/label-email.webp" alt="EMAIL" width="320" height="173" loading="lazy" decoding="async"><span class="tag-value">17375051324@163.com</span></p><p class="tag-item"><img class="tag-label" src="assets/label-github.webp" alt="GITHUB" width="320" height="157" loading="lazy" decoding="async"><span class="tag-value">github.com/yanghang-bcz</span></p><p class="tag-item"><img class="tag-label" src="assets/label-base.webp" alt="BASE" width="320" height="155" loading="lazy" decoding="async"><span class="tag-value">Shanghai</span></p></div><div class="about-photos"><figure class="photo-print photo-print--base"><img src="assets/photo-bamboo.jpg" alt="杨航在雨后的竹林小径上撑着透明伞站着" width="640" height="854" loading="lazy" decoding="async"></figure><figure class="photo-print photo-print--top"><img src="assets/photo-selfie.jpg" alt="杨航在绿植前的自拍，背后草地上站着一只白鹅" width="480" height="640" loading="lazy" decoding="async"></figure></div><a href="#works" data-route="works" class="text-link in-content">EXPLORE MY WORKS ↗ <span>看看作品</span></a></div>
+        <div class="empty-entry about-entry"><p class="category">A NOTE FROM SHANGHAI</p><h2>你好，我是杨航。</h2><p>欢迎你来了解关于我。平时特别喜欢听音乐和研究音乐，如果你想了解我的音乐偏好和理解，可以点进 <a href="#music" data-route="music" class="inline-link">Music 专栏</a>。</p><p>同时也很喜欢看书，正不断拓宽自己的阅读面；喜欢讨论社会学问题，会思考关于性别与身体、人际间关系、权力与制度、技术与人等话题。</p><p>我也会在平时做一做自己的小工具和小网站，通过作品与世界和人建立更深的联系，去影响他人和社会。</p><div class="field-tags"><p class="tag-item"><img class="tag-label" data-src="assets/label-mbti.webp" alt="MBTI" width="320" height="146" loading="lazy" decoding="async"><span class="tag-value">ENFJ 主人公</span></p><p class="tag-item"><img class="tag-label" data-src="assets/label-email.webp" alt="EMAIL" width="320" height="173" loading="lazy" decoding="async"><span class="tag-value">17375051324@163.com</span></p><p class="tag-item"><img class="tag-label" data-src="assets/label-github.webp" alt="GITHUB" width="320" height="157" loading="lazy" decoding="async"><span class="tag-value">github.com/yanghang-bcz</span></p><p class="tag-item"><img class="tag-label" data-src="assets/label-base.webp" alt="BASE" width="320" height="155" loading="lazy" decoding="async"><span class="tag-value">Shanghai</span></p></div><div class="about-photos"><figure class="photo-print photo-print--base"><img data-src="assets/photo-bamboo.jpg" alt="杨航在雨后的竹林小径上撑着透明伞站着" width="640" height="854" loading="lazy" decoding="async"></figure><figure class="photo-print photo-print--top"><img data-src="assets/photo-selfie.jpg" alt="杨航在绿植前的自拍，背后草地上站着一只白鹅" width="480" height="640" loading="lazy" decoding="async"></figure></div><a href="#works" data-route="works" class="text-link in-content">EXPLORE MY WORKS ↗ <span>看看作品</span></a></div>
         <footer class="folio-footer"><span>YANGHANG / ABOUT ME</span><span class="footer-copy">© 2026 YangHang / Bryce</span><span>SHANGHAI, CHINA</span></footer>
       </div>
     </section>
@@ -161,20 +162,20 @@
         <a href="#home" data-route="home" class="back-link">← BACK HOME <span>返回首页</span></a>
         <header class="folio-heading"><p class="archive-number">05 / PERSONAL ARCHIVE</p><h1 id="travel-title" tabindex="-1">Travel Log</h1><p>去体验不同地域的人和风景</p></header>
         <ul class="travel-gallery" aria-label="十四座城市的旅行照片">
-          <li class="travel-photo" style="--photo-tilt:-2deg"><figure><img src="assets/travel/Beijing.jpg" alt="Beijing 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Beijing</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:1.5deg"><figure><img src="assets/travel/Changsha.jpg" alt="Changsha 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Changsha</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:-1.2deg"><figure><img src="assets/travel/Chengdu.jpg" alt="Chengdu 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Chengdu</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:2deg"><figure><img src="assets/travel/Chongqing.jpg" alt="Chongqing 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Chongqing</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:-1.6deg"><figure><img src="assets/travel/Guangzhou.jpg" alt="Guangzhou 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Guangzhou</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:1.2deg"><figure><img src="assets/travel/Guiyang.jpg" alt="Guiyang 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Guiyang</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:-1.8deg"><figure><img src="assets/travel/Hangzhou.jpg" alt="Hangzhou 旅行照片" width="1079" height="1400" loading="lazy" decoding="async"><figcaption>Hangzhou</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:1.6deg"><figure><img src="assets/travel/Jiaxing.jpg" alt="Jiaxing 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Jiaxing</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:-1.1deg"><figure><img src="assets/travel/Nanjing.jpg" alt="Nanjing 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Nanjing</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:1.8deg"><figure><img src="assets/travel/Qingdao.jpg" alt="Qingdao 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Qingdao</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:-1.5deg"><figure><img src="assets/travel/Shanghai.jpg" alt="Shanghai 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Shanghai</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:1.1deg"><figure><img src="assets/travel/Suzhou.jpg" alt="Suzhou 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Suzhou</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:-1.9deg"><figure><img src="assets/travel/Tianjin.jpg" alt="Tianjin 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Tianjin</figcaption></figure></li>
-          <li class="travel-photo" style="--photo-tilt:1.4deg"><figure><img src="assets/travel/Wuhan.jpg" alt="Wuhan 旅行照片" width="975" height="1300" loading="lazy" decoding="async"><figcaption>Wuhan</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-2deg"><figure><img data-src="assets/travel/Beijing.jpg" alt="Beijing 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Beijing</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.5deg"><figure><img data-src="assets/travel/Changsha.jpg" alt="Changsha 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Changsha</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.2deg"><figure><img data-src="assets/travel/Chengdu.jpg" alt="Chengdu 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Chengdu</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:2deg"><figure><img data-src="assets/travel/Chongqing.jpg" alt="Chongqing 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Chongqing</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.6deg"><figure><img data-src="assets/travel/Guangzhou.jpg" alt="Guangzhou 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Guangzhou</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.2deg"><figure><img data-src="assets/travel/Guiyang.jpg" alt="Guiyang 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Guiyang</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.8deg"><figure><img data-src="assets/travel/Hangzhou.jpg" alt="Hangzhou 旅行照片" width="1079" height="1400" loading="lazy" decoding="async"><figcaption>Hangzhou</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.6deg"><figure><img data-src="assets/travel/Jiaxing.jpg" alt="Jiaxing 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Jiaxing</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.1deg"><figure><img data-src="assets/travel/Nanjing.jpg" alt="Nanjing 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Nanjing</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.8deg"><figure><img data-src="assets/travel/Qingdao.jpg" alt="Qingdao 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Qingdao</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.5deg"><figure><img data-src="assets/travel/Shanghai.jpg" alt="Shanghai 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Shanghai</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.1deg"><figure><img data-src="assets/travel/Suzhou.jpg" alt="Suzhou 旅行照片" width="1050" height="1400" loading="lazy" decoding="async"><figcaption>Suzhou</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:-1.9deg"><figure><img data-src="assets/travel/Tianjin.jpg" alt="Tianjin 旅行照片" width="1100" height="825" loading="lazy" decoding="async"><figcaption>Tianjin</figcaption></figure></li>
+          <li class="travel-photo" style="--photo-tilt:1.4deg"><figure><img data-src="assets/travel/Wuhan.jpg" alt="Wuhan 旅行照片" width="975" height="1300" loading="lazy" decoding="async"><figcaption>Wuhan</figcaption></figure></li>
         </ul>
         <footer class="folio-footer"><span>YANGHANG / TRAVEL LOG</span><span class="footer-copy">© 2026 YangHang / Bryce</span><span>14 CITIES</span></footer>
       </div>

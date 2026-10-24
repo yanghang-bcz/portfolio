@@ -163,7 +163,9 @@
       cover.style.setProperty('--cover-color', album.color);
       if (album.cover) {
         const image = document.createElement('img');
-        image.src = album.cover;
+        // 分级加载：Music 的 16 张封面要等这个栏目真的被打开才取（见 tiered.js）
+        image.dataset.src = album.cover;
+        image.dataset.tier = 'music';
         image.alt = album.title ? `${album.title} — ${album.artist}` : '专辑封面';
         image.loading = showCaption ? 'eager' : 'lazy';
         image.decoding = 'async';

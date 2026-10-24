@@ -13,8 +13,15 @@
  const rect=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}};
  await load(1920,1080);
  let d=frame.contentDocument,w=frame.contentWindow;
- const eagerImgs=[...d.images].filter(i=>i.loading!=='lazy');
+ // 分级加载后，非当前栏目的 <img> 在进入前只有 data-src、没有 src——那不是"坏图"。
+ // 所以这里只看真的发起了加载的那些（有 src 的）。
+ const eagerImgs=[...d.images].filter(i=>i.loading!=='lazy'&&i.getAttribute('src'));
  check('Every eagerly loaded image asset resolved',eagerImgs.length>=13&&eagerImgs.every(i=>i.complete&&i.naturalWidth>0),{count:eagerImgs.length,broken:eagerImgs.filter(i=>!i.complete||!i.naturalWidth).map(i=>i.getAttribute('src'))});
+// 首访只该拿首页的东西。Music / Travel 一个字节都不该发出去。
+ const resNames=()=>w.performance.getEntriesByType('resource').map(e=>e.name);
+ check('Tiered loading: first Home paint requests no Music or Travel asset',
+   !resNames().some(n=>/assets\/(music|travel)\//.test(n)),
+   {music:resNames().filter(n=>/assets\/music\//.test(n)).length,travel:resNames().filter(n=>/assets\/travel\//.test(n)).length});
  check('Special Elite loaded',d.fonts.check('16px "Special Elite"'));
  let first=positions(d);await wait(220);check('All five satellites translate along orbit',positions(d).every((p,i)=>p!==first[i]));
  const radio=d.querySelector('[data-satellite="music"]');
@@ -116,6 +123,12 @@ const hts=floaters.map(i=>i.offsetHeight),noteH=hts.slice(0,3);
 check('The gramophone outscales the three notes, which stay uniform',
   hts[3]>Math.max(...noteH)+8&&Math.max(...noteH)-Math.min(...noteH)<=2&&hts[3]/Math.max(...noteH)>1.25,
   {heights:hts,ratio:+(hts[3]/Math.max(...noteH)).toFixed(2)});
+// 分级加载的反面：进到 Music 就必须全部到位，而且每张封面只请求一次（不能重复下载）。
+const musicCovers=[...d.querySelectorAll('#music img[data-tier="music"]')];
+const musicReqs=resNames().filter(n=>/assets\/music\//.test(n));
+check('Tiered loading: all 16 covers arrive on first Music entry, one request each',
+  musicCovers.length===16&&musicCovers.every(i=>i.complete&&i.naturalWidth>0)&&musicReqs.length===16,
+  {covers:musicCovers.length,loaded:musicCovers.filter(i=>i.complete&&i.naturalWidth>0).length,requests:musicReqs.length});
 const tA=floaters.map(i=>w.getComputedStyle(i).transform);await wait(450);
 const tB=floaters.map(i=>w.getComputedStyle(i).transform);
 check('They drift like the astronaut, each on its own phase',tA.every((v,i)=>v!==tB[i])&&new Set(floaters.map(i=>w.getComputedStyle(i).animationDuration)).size>1,
